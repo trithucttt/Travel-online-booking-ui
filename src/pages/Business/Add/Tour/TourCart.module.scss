@@ -1,0 +1,134 @@
+.search {
+    margin: 40px auto;
+    text-align: center;
+    .searchItem {
+        border: 1px solid #333;
+        border-radius: 5px;
+        outline: none;
+    }
+}
+
+.tourContainer {
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 20px;
+    margin: 30px;
+    .tourCard {
+        display: block;
+        width: 100%;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        margin-bottom: 20px;
+        .cardHeader {
+            width: 100%;
+            background-color: #f4f4f4;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: space-between;
+            .cardTitle {
+                font-size: 1.6rem;
+                font-weight: 600;
+                color: rgb(96, 173, 237);
+            }
+        }
+        .cardBody {
+            width: 100%;
+            display: flex;
+            .cardImage {
+                width: 30%;
+                margin: 5px;
+                .imageItem {
+                    border-radius: 8px;
+                }
+            }
+            .cardInfo {
+                width: 70%;
+                margin-top: 20px;
+                .cardInfoTop {
+                    margin-left: 20px;
+                    display: flex;
+                    .destinationTour {
+                        width: 100%;
+                        position: relative;
+                        height: 10vh;
+                        overflow-y: auto;
+                        .destinationItem {
+                            margin-left: 30px;
+                            font-style: italic;
+                            color: rgb(159, 204, 200);
+                        }
+                    }
+                    .tourCalendar {
+                        align-items: center;
+                        font-style: italic;
+                        margin-top: 20px;
+                        font-size: 16px;
+                        color: rgb(119, 134, 220);
+                        .date {
+                            p {
+                                margin-left: 5px;
+                            }
+                        }
+                        .startDay {
+                            p {
+                                margin-right: 30px;
+                            }
+                        }
+                        .endDay {
+                            p {
+                                margin-right: 40px;
+                            }
+                        }
+                    }
+                }
+                .cardInfoBottom {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-right: 30px;
+                    .rating {
+                        margin-left: 20px;
+                        margin-bottom: 10px;
+                        .ratingItem {
+                            color: rgb(200, 84, 229);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+    margin-right: 30px;
+}
+.dropdownContent {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 120px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    right: 0; /* Đặt vị trí của dropdown so với cạnh phải của .dropdown */
+    top: 100%;
+}
+.dropdownContent button {
+    color: black;
+    padding: 5px 8px;
+    text-decoration: none;
+    display: block;
+    width: 100%;
+}
+
+.dropdownContent button:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropdownContent {
+    display: block;
+}

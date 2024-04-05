@@ -1,0 +1,154 @@
+.error {
+    color: red;
+    font-size: 12px;
+    font-style: italic;
+    padding-left: 15px;
+}
+.container {
+    margin: 30px;
+    .inputInfo {
+        width: 100%;
+        height: calc(40px);
+        border: 1px solid hsl(0, 0%, 51%);
+        margin: 5px;
+        outline: none;
+        border-radius: 8px;
+        padding-left: 15px;
+        &:hover {
+            border: none;
+            border: 2px solid #010101;
+        }
+    }
+    .formGroupTitle {
+        label {
+            display: inline-block;
+            width: 25%; /* Đảm bảo label có độ rộng cố định */
+            text-align: left; /* Căn nội dung sang phải */
+            margin-right: 10px;
+        }
+        .inputTitle {
+        }
+    }
+    .formGroupDate {
+        .endDay {
+            label {
+                display: inline-block;
+                width: 25%; /* Đảm bảo label có độ rộng cố định */
+                text-align: left; /* Căn nội dung sang phải */
+                margin-right: 10px;
+            }
+        }
+    }
+    .location {
+        display: flex;
+        label {
+            display: inline-block;
+            width: 55%; /* Đảm bảo label có độ rộng cố định */
+            text-align: left; /* Căn nội dung sang phải */
+            margin-right: 10px;
+        }
+        .groupLocation {
+            margin-right: 10px;
+            width: 35%;
+        }
+        select {
+            width: 100%;
+            height: calc(40px);
+            border: 1px solid hsl(0, 0%, 64%);
+            margin: 5px;
+            outline: none;
+            border-radius: 8px;
+            padding-left: 15px;
+            margin-right: 10px;
+            &:hover {
+                border: 2px solid hsl(0, 0%, 0%);
+            }
+        }
+    }
+    .startDay {
+        label {
+            display: inline-block;
+            width: 25%; /* Đảm bảo label có độ rộng cố định */
+            text-align: left; /* Căn nội dung sang phải */
+            margin-right: 10px;
+        }
+        input {
+            padding-bottom: 5px;
+        }
+    }
+    .btnAddTour {
+        width: 20%;
+        border: 1px solid #92d5fa;
+        border-radius: 5px;
+        float: right;
+        margin: 5px;
+        color: rgb(245, 245, 250);
+        background: #65b7e2;
+    }
+    .formGroupDiscount {
+        width: 100%;
+        padding-top: 40px;
+        display: flex;
+        .controlDiscount {
+            display: flex;
+            margin-left: 5rem;
+            .inputDiscount {
+                width: 60%;
+                margin: 0 10px 0 10px;
+                text-align: center;
+                border: 1px solid #333;
+                padding-left: 15px;
+                border-radius: 8px;
+            }
+            label {
+                display: inline-block;
+                width: 25%; /* Đảm bảo label có độ rộng cố định */
+                text-align: right; /* Căn nội dung sang phải */
+                margin-right: 10px;
+            }
+            .iconMinus {
+                margin-top: 5px;
+                cursor: pointer;
+            }
+            .iconPlus {
+                cursor: pointer;
+                margin-top: 5px;
+            }
+        }
+    }
+}
+.groupInfoTourAdd {
+    margin-top: 40px;
+
+    .inFoRoom {
+        display: flex;
+        justify-content: space-between;
+        border: 1px solid #92d5fa;
+        margin: 5px;
+        border-radius: 5px;
+        .tourNameAdd {
+            padding-left: 10px;
+            height: 35px;
+            padding-top: 5px;
+        }
+        .iconDeleteTour {
+            cursor: pointer;
+            margin-right: 30px;
+            padding-top: 10px;
+            color: red;
+        }
+    }
+}
+
+.groupButton {
+    text-align: right;
+    margin-top: 40px;
+    .btnSave {
+        color: #f4f4f4;
+        background-color: #927ebe;
+        border: 1px solid #927ebe;
+        width: 100px;
+        height: 40px;
+        border-radius: 5px;
+    }
+}

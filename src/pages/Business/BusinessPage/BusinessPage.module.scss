@@ -1,0 +1,131 @@
+.container {
+    height: 90.5vh;
+    display: flex;
+    .headerPage {
+        width: 30%;
+        // text-align: center;
+        border: 1px solid hsl(0, 0%, 20%);
+        .infoGroup {
+            margin-top: 60px;
+            width: 100%;
+            height: 60vh;
+            // text-align: center;
+            .imageGroup {
+                align-items: center;
+                .imageUser {
+                    border-radius: 50%;
+                    object-fit: cover;
+                    width: 120px;
+                    height: 120px;
+                    margin: auto;
+                }
+                .changeImgBnt {
+                    width: 30%;
+                    height: 50px;
+                    text-align: center;
+                    margin-left: 160px;
+                    margin-top: 15px;
+                    border: 1px solid #333;
+                    border-radius: 18px;
+                    font-weight: 600;
+                }
+            }
+            .businessInfo {
+                margin-right: 15px;
+                margin-top: 10px;
+                display: flex;
+                label {
+                    display: inline-block;
+                    width: 25%; /* Đảm bảo label có độ rộng cố định */
+                    text-align: right; /* Căn nội dung sang phải */
+                    margin-right: 10px;
+                }
+                .inputInfoUser {
+                    width: 65%;
+                    height: 30px;
+                    border-bottom: 1px solid #4bdcef;
+                    font-size: 15px;
+                    outline: none;
+                    // margin-left: 40px;
+                    // box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+                    &:hover {
+                        border-bottom: 2px solid #40cfe2;
+                    }
+                }
+            }
+        }
+        .buttonGroup {
+            width: 100%;
+            margin-left: 140px;
+            margin-top: 30px;
+            .btn {
+                border: none;
+                border-radius: 5px;
+                margin: 5px;
+                font-weight: 400;
+                // box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+            }
+            .editBtn {
+                background: #cbcdd2;
+                color: #050505;
+                width: 40%;
+                height: 40%;
+                margin: auto;
+            }
+        }
+    }
+    .bodyPage {
+        width: 70%;
+        max-height: calc(100vh);
+        overflow-y: auto;
+        border: 1px solid hsl(0, 0%, 20%);
+        position: relative;
+
+        .pageItem {
+            margin-top: 30px;
+            padding: 10px;
+        }
+    }
+}
+.dropdown {
+    width: 120px;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+.controlPage {
+    width: 100px;
+    background: #0866ff;
+    color: aliceblue;
+    border: none;
+    border-radius: 5px;
+    margin: 5px;
+    font-weight: 400;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+.dropdownContent {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    right: 0; /* Đặt vị trí của dropdown so với cạnh phải của .dropdown */
+    top: 100%;
+}
+
+.dropdownContent button {
+    width: 100%;
+    color: black;
+    padding: 5px 8px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdownContent button:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown:hover .dropdownContent {
+    display: block;
+}

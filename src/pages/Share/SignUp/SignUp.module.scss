@@ -1,0 +1,71 @@
+.buttonHeader {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px;
+    .btn {
+        width: 100px;
+        height: 10%;
+        border-radius: 5px;
+        background: #333;
+        color: #fff;
+    }
+    .btnBack {
+    }
+    .btnSignUp {
+    }
+}
+.signupContainer {
+    width: 100%;
+    // border: 1px solid #333;
+    margin-top: 10%;
+
+    .signupTitle {
+        text-align: center;
+        margin-bottom: 20px;
+        h1 {
+            font-weight: 800;
+        }
+        .renderSignUp {
+            color: #37c7e4;
+            text-decoration: none;
+        }
+    }
+    .signupForm {
+        width: 30%;
+        // border: 1px solid #333;
+        margin: 0 auto;
+        .formTm {
+            text-align: center;
+            .formGroup {
+                margin: 5px;
+                .inputField {
+                    border-color: #37c7e4;
+                    &:hover {
+                        border: 3px solid #37c7e4;
+                    }
+                }
+            }
+            .buttonGroup {
+                padding-top: 20px;
+                .signupButton {
+                    width: 100%;
+                    border-radius: 5px;
+                    background: #37c7e4;
+                    height: 30px;
+                    text-align: center;
+                    margin: 5px;
+                    border-color: #37c7e4;
+                    font-weight: 600;
+                    color: aliceblue;
+                    &:hover {
+                        background: #458d9b;
+                    }
+                }
+                .signupWithLink {
+                    color: #333;
+                    text-decoration: none;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,94 @@
+.sliderContainer {
+    width: 95%;
+    height: 100%;
+    box-sizing: border-box;
+    margin: 0 auto;
+    margin-top: 60px;
+    .centerControls {
+        display: flex;
+        justify-content: space-between;
+        position: absolute;
+        width: 97%;
+        top: 150%;
+        // transform: translateY(-50%);
+        // padding-right: 170px;
+        .leftControl,
+        .rightControl {
+            cursor: pointer;
+            color: rgb(12, 12, 124);
+            // border: 1px solid #333;
+            font-weight: 800;
+            font-size: 30px;
+            margin-right: 25px;
+        }
+
+        .leftControl:hover,
+        .rightControl:hover {
+            color: #007bff;
+        }
+    }
+}
+
+.tourSlide {
+    width: 90%;
+
+    .cardProduct {
+        border: 1px solid #333;
+        margin-right: 120px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+    }
+    .cardProductImg {
+        max-width: 100%;
+        .imagePost {
+            width: 100%;
+        }
+    }
+    .cardProductText {
+        .destinationTour {
+            display: flex;
+            justify-content: center;
+            padding: 5px;
+            .itemsDestination {
+                border: 1px double #333;
+                border-radius: 5px;
+                padding: 15px;
+                margin: 5px;
+                margin: 0 auto;
+            }
+        }
+        .productPrice {
+            width: 100%;
+            display: flex;
+            justify-content: right;
+            padding-right: 15px;
+        }
+        .productFooter {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 50px 20px 50px;
+            .footerRight {
+                font-size: 1.8rem;
+            }
+        }
+    }
+}
+
+:global(.slick-track) {
+    height: 480px;
+    width: 80%;
+}
+
+:global(.slick-slider) {
+    height: 720px;
+}
+
+:global(.slick-initialized) {
+    height: 720px;
+}
+
+:global(.slick-list) {
+    // height: 1100px;
+    height: 150%;
+}

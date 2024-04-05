@@ -1,0 +1,92 @@
+.infoContent {
+    display: flex;
+    .infoGroup {
+        position: relative;
+        top: 150px;
+        margin-top: 60px;
+        width: 70%;
+        .error {
+            text-align: center;
+            color: red;
+            font-style: italic;
+            font-size: 15px;
+        }
+        .businessInfo {
+            margin-right: 15px;
+            margin-top: 10px;
+            display: flex;
+
+            label {
+                display: inline-block;
+                width: 25%;
+                text-align: right;
+                margin-right: 10px;
+                user-select: none;
+            }
+            .inputInfoUser {
+                width: 65%;
+                height: 30px;
+                border-bottom: 1px solid #4bdcef;
+                font-size: 15px;
+                outline: none;
+                &:hover {
+                    border-bottom: 2px solid #40cfe2;
+                }
+            }
+        }
+        .buttonGroup {
+            width: 100%;
+            margin-top: 30px;
+            text-align: center;
+            .btn {
+                border: none;
+                border-radius: 5px;
+                margin: 5px;
+                font-weight: 400;
+                // box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+            }
+            .editBtn {
+                background: #a9c0f9;
+                color: #050505;
+                width: 180px;
+                height: 40px;
+                margin: auto;
+                &:hover {
+                    background: rgb(85, 230, 112);
+                }
+            }
+            .cancelBtn {
+                background: #a9c0f9;
+                color: #050505;
+                width: 180px;
+                height: 40px;
+                margin: 10px;
+                &:hover {
+                    background: rgb(235, 114, 114);
+                }
+            }
+        }
+    }
+    .imageGroup {
+        position: relative;
+        top: 150px;
+        width: 30%;
+        text-align: center;
+        .imageUser {
+            border-radius: 50%;
+            object-fit: cover;
+            width: 180px;
+            height: 180px;
+            margin: auto;
+        }
+        .changeImgBnt {
+            width: 250px;
+            height: 50px;
+            text-align: center;
+            margin-top: 15px;
+            border: 1px solid #333;
+            border-radius: 18px;
+            font-weight: 600;
+        }
+    }
+}

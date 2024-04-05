@@ -1,0 +1,124 @@
+.containerCart {
+    display: flex;
+    height: 90vh;
+
+    .ownerCart {
+        width: 30%;
+        // border-right: 1px solid hsl(0, 0%, 20%);
+        text-align: center;
+        height: 90vh;
+        border-radius: 10px;
+        // background-color: rgb(193, 241, 241);
+        background-image: url('https://i.pinimg.com/564x/ba/c1/3b/bac13be3e2bfa7664aacd956df357442.jpg');
+        // background-image: url('https://i.pinimg.com/736x/ff/56/eb/ff56eb5464c6f1a7786243383fb4a788.jpg');
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        background-position: 20px;
+        background-repeat: no-repeat;
+        .imageUser {
+            // // position: absolute;
+            border-radius: 50%;
+            object-fit: cover;
+            // width: 180px;
+            width: 220px;
+            height: 220px;
+            margin: 0 auto;
+            margin-top: 200px;
+
+            // object-fit: cover;
+            // width: 310px;
+            // height: 232px;
+            // margin: 0 auto;
+            // margin-top: 152px;
+            // margin-left: 62px;
+        }
+
+        .ownerName {
+            // margin-top: 50px;
+            // font-weight: 800;
+            // background: #877823;
+            // background: #877823;
+
+            font-weight: 800;
+            height: 62px;
+            width: 281px;
+            margin: 48px 71px auto;
+            padding-top: 7px;
+            font-size: 26px;
+        }
+    }
+
+    .infoCart {
+        width: 70%;
+        font-size: 16px;
+        margin-top: 10px;
+        margin-left: 40px;
+        margin-right: 40px;
+        .checkOutItem {
+            height: 15%;
+            border-radius: 5px;
+            display: flex;
+            background: #fcddef;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            // border: 1px solid #333;
+            .paymentGroup {
+                margin: 15px;
+                font-size: 16px;
+                font-weight: 500;
+                margin-top: 30px;
+                margin-left: 20px;
+            }
+            .groupCheckAll {
+                width: 30%;
+                display: flex;
+                .checkAllCart {
+                    transform: scale(1.2);
+                    cursor: pointer;
+                    // margin: 5px;
+                    margin-right: 5px;
+                }
+            }
+            .totalPrice {
+                width: 30%;
+                color: rgb(0, 0, 0);
+                font-weight: 500;
+                font-style: italic;
+            }
+            .btnCheckOut {
+                width: 30%;
+                // height: 40px;
+                // color: #417ac1;
+                border: 1px solid transparent;
+                border-radius: 5px;
+                background-color: rgb(193, 237, 244);
+                width: 120px;
+                color: black;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                font-weight: 600;
+                &:hover {
+                    // font-size: 18px;
+                    color: black;
+                    background-color: #7ee1f3;
+                }
+            }
+            .paymentMethod {
+                width: 30%;
+                select {
+                    outline: none;
+                    border-radius: 5px;
+                }
+                .optionPayment {
+                }
+            }
+        }
+
+        .CartItem {
+            width: 100%;
+            max-height: calc(75vh); /* 10% để trừ đi phần height của checkOutItem */
+            overflow-y: auto;
+            // border: 1px solid hsl(0, 0%, 20%);
+            position: relative;
+            // top: 10%; /* Đặt top ở 10% để bắt đầu từ phía dưới của checkOutItem */
+            bottom: 0; /* Đặt bottom ở 0 để nó kéo dài đến đáy container */
+        }
+    }
+}

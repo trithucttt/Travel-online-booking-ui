@@ -1,0 +1,177 @@
+/* YourBooking.css */
+.cartItem {
+    width: 97%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin: 0px auto;
+    // padding-left: 150px;
+    padding-left: 20px;
+    .groupCheckbox {
+        font-size: 20px;
+        .inputCheckBox {
+            transform: scale(1.5); /* Tăng kích thước của checkbox lên 1.5 lần */
+            margin: 5px; /* Thêm khoảng cách xung quanh nếu cần */
+            cursor: pointer;
+        }
+    }
+    .imageCart {
+        height: 280px;
+        width: 400px;
+        background-color: none;
+        border: none;
+        margin: 5px;
+        margin-top: 30px;
+        .imageItems {
+            height: 250px;
+            width: 400px;
+            margin-left: 0 auto;
+            margin-right: 40px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+    }
+
+    .cartFrame {
+        position: relative;
+        display: block;
+        width: 100%;
+        height: 250px;
+        margin-left: 5px;
+        .cartSection {
+            width: 100%;
+            border: #dbdbdb solid 1px;
+            background: #ebebeb;
+            margin-left: 5px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            .headerCart {
+                display: flex;
+                margin: 20px;
+                .tourName {
+                    margin-right: 10px;
+                }
+            }
+            .bodyCart {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                .contentCart {
+                    padding: 0 0 10px 20px;
+                    .contentCartItem {
+                        list-style: none;
+                    }
+                }
+                .iconTrash {
+                    padding-bottom: 30px;
+                    padding-right: 25px;
+                    cursor: pointer;
+                    &:hover {
+                        color: #00a2ff;
+                    }
+                }
+            }
+        }
+        .cartFooter {
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            border: none;
+            background: #ebebeb;
+            border-radius: 8px;
+            margin-left: 5px;
+            margin-top: 20px;
+            height: 45px;
+            display: flex;
+            position: absolute;
+            justify-content: space-between;
+            .groupIcon {
+                display: flex;
+                text-align: center;
+                .iconMinus {
+                    // background-color: #fff;
+                    border: none;
+                    margin: 15px;
+                    font-size: 1.2rem;
+                }
+                .quantityCart {
+                    outline: none;
+                    background-color: transparent;
+                    text-align: center;
+                }
+                .iconPlus {
+                    // background-color: #fff;
+                    border: none;
+                    font-size: 1.2rem;
+                    margin: 15px;
+                }
+            }
+            .cartPrice {
+                padding-top: 6px;
+                font-style: italic;
+            }
+            .totalPrice {
+                padding: 10px;
+                padding-top: 6px;
+                color: aliceblue;
+                font-style: oblique;
+                font-weight: 700;
+                font-size: 1.2rem;
+                background-color: #53b5aa;
+            }
+        }
+    }
+}
+
+// .section {
+//     display: flex;
+// }
+// .checkAll {
+//     position: relative;
+//     margin: 10px;
+//     font-size: 20px;
+//     width: 100%;
+//     font-style: italic;
+//     /* right: -550px; */
+//     display: flex;
+// }
+// .comboBox {
+//     display: block;
+//     align-items: center;
+//     margin-left: 100px;
+//     margin-right: 20px;
+// }
+// .total {
+//     color: red;
+// }
+// .checkBoxAll {
+//     width: 1.2rem;
+//     height: 1.2rem;
+//     margin: 15px;
+// }
+// .btnCheckout {
+//     border: 1px solid #00a2ff;
+//     border-radius: 8px;
+//     background-color: transparent;
+//     color: #12171b;
+//     font-size: 1em;
+//     cursor: pointer;
+//     text-transform: none;
+//     transition: border-color 0.2s, color 0.2s;
+//     width: 200px;
+//     height: 35px;
+//     margin: 10px 0; /* Điều chỉnh khoảng cách giữa các button */
+// }
+
+// .btnCheckout:hover {
+//     border-color: #eeeeee;
+//     border: 2px solid #00a2ff;
+//     color: rgb(32, 23, 23);
+// }
+
+@media screen and (max-width: 1014px) {
+    .yourBooking {
+        height: 100%;
+        width: 100%;
+        padding: 10px; /* Điều chỉnh padding khi màn hình nhỏ hơn */
+    }
+}

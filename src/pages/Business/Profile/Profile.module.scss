@@ -1,0 +1,86 @@
+.container {
+    display: flex;
+    height: 100vh;
+    background: #888;
+    .sidebar {
+        width: 20%;
+        background-color: #203a4b;
+        padding: 20px;
+        color: aliceblue;
+        overflow-y: auto;
+        position: relative;
+        .sidebarAvatar {
+            margin-bottom: 50px;
+            .avatarImage {
+                margin: 0 auto;
+                height: 150px;
+                width: 150px;
+                border-radius: 50%;
+            }
+        }
+        .menuItems {
+            cursor: pointer;
+            margin-bottom: 30px;
+            font-size: 18px;
+            font-weight: 600;
+            user-select: none;
+
+            .submenu {
+                padding-left: 10px;
+                max-height: 0;
+                // display: none;
+                overflow: hidden;
+                transition: 0.8s all;
+                .subItems {
+                    margin-top: 10px;
+                    font-size: 15px;
+                    font-weight: 500;
+                    border-bottom: 1px solid rgb(113, 113, 113);
+                    margin-bottom: 5px;
+                    padding: 5px;
+                }
+                .activeSubItem {
+                    font-size: 15px;
+                    font-weight: 500;
+                    color: #f8b739;
+                    margin-top: 10px;
+                    margin-bottom: 5px;
+                    border-bottom: 1px solid rgb(113, 113, 113);
+                    padding: 5px;
+                }
+            }
+            .activeSubMenu {
+                max-height: 200px;
+            }
+            .menuItemsTag {
+                display: flex;
+                .menuTitle {
+                    width: 95%;
+                    border-bottom: 1px solid rgb(113, 113, 113);
+                }
+                .menuActive {
+                    width: 95%;
+                    color: #f8b739;
+                    border-bottom: 1px solid rgb(113, 113, 113);
+                }
+                .iconSub {
+                    width: 5%;
+                }
+                .iconSubActive {
+                    width: 5%;
+                    color: #f8b739;
+                }
+            }
+        }
+    }
+    .content {
+        background: #ffffff;
+        width: 80%;
+        overflow-y: auto;
+        position: relative;
+        height: calc(100vh);
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        border-left: 3px solid #fff;
+    }
+}

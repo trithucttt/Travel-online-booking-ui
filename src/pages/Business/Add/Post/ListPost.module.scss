@@ -1,0 +1,167 @@
+.link {
+    text-decoration: none;
+}
+.search {
+    margin: 40px auto;
+    text-align: center;
+    .searchItem {
+        border: 1px solid #333;
+        border-radius: 5px;
+        outline: none;
+    }
+}
+.framePost {
+    height: auto;
+    width: 100%;
+    // border: 1px solid #333;
+    background: var(--primary);
+    border-radius: 8px;
+    margin: 20px;
+    box-sizing: border-box;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    .postHeader {
+        display: flex;
+        .imageOwnerPost {
+            .imageUser {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                object-fit: cover;
+                margin: 5px;
+            }
+        }
+        .NameOwnerPost {
+            margin-top: 10px;
+            margin-left: 5px;
+            cursor: pointer;
+            height: fit-content;
+        }
+    }
+
+    .postBody {
+        display: flex;
+        .postImage {
+            width: 25%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            overflow: hidden;
+            max-height: 500px;
+            padding-left: 20px;
+            padding-right: 20px;
+            padding-top: 15px;
+
+            .itemImage {
+                width: 50%;
+                height: 120px;
+                object-fit: cover;
+                cursor: pointer;
+                transition: transform 0.3s ease;
+
+                &:nth-child(3n) {
+                    margin-right: 0;
+                }
+
+                &:hover {
+                    transform: scale(1.2);
+                }
+            }
+
+            .showAllButton {
+                width: 50%;
+                height: 120px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                background-color: #ddd;
+                transition: transform 0.3s ease;
+
+                &:hover {
+                    transform: scale(1.2);
+                }
+            }
+        }
+
+        .postInfo {
+            width: 55%;
+            height: 100%;
+            border-right: 1px solid #333;
+            margin-bottom: 10px;
+            cursor: pointer;
+            .tagDiscount {
+                color: #20c997;
+            }
+            .titlePost {
+                font-weight: 800;
+                font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+            }
+            .addressInfo {
+                color: rgb(71, 112, 216);
+                font-size: 16px;
+                font-weight: 500;
+            }
+        }
+
+        .postRating {
+            text-align: center;
+            margin: auto;
+            cursor: pointer;
+            .baseRating {
+                padding-top: 35px;
+                padding: 30px;
+            }
+            .discount {
+                padding-top: 35px;
+                text-align: right;
+                .labelDiscount {
+                    background: #dc3545;
+                    color: aliceblue;
+                    width: fit-content;
+                    padding: 10px;
+                    align-items: center;
+                }
+                .currentPrice {
+                    text-decoration: line-through;
+                }
+                .serviceDiscount {
+                    color: #fea116;
+                    font-weight: 600;
+                }
+            }
+        }
+    }
+
+    @media screen and (max-width: 900px) {
+        width: 100%;
+        margin: 10px 0;
+        .postBody {
+            display: block; /* Chuyển từ hiển thị dạng flex sang block để các phần tử xuất hiện chồng lên nhau */
+            .postImage {
+                width: 100%; /* Chiếm toàn bộ độ rộng khi trên màn hình nhỏ */
+                padding: 0; /* Xóa padding để hình ảnh chiếm toàn bộ khối */
+            }
+            .postInfo {
+                width: 100%; /* Chiếm toàn bộ độ rộng khi trên màn hình nhỏ */
+                border-right: none; /* Xóa đường viền phải */
+                margin-bottom: 15px; /* Tăng khoảng cách phía dưới */
+            }
+            .postRating {
+                position: relative; /* Đặt lại vị trí */
+                right: 0; /* Đặt lại vị trí */
+            }
+        }
+        .postHeader {
+            .imageOwnerPost {
+                .imageUser {
+                    width: 30px; /* Giảm kích thước ảnh người dùng */
+                    height: 30px; /* Giảm kích thước ảnh người dùng */
+                    margin: 3px; /* Giảm khoảng cách xung quanh ảnh */
+                }
+            }
+            .NameOwnerPost {
+                margin-left: 3px; /* Giảm khoảng cách từ tên đến hình ảnh người dùng */
+            }
+        }
+    }
+}
