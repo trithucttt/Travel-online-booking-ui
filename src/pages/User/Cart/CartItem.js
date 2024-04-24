@@ -5,7 +5,21 @@ import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 import styles from './CartItem.module.scss';
 import { faSquare, faSquareCheck, faTrashCan } from '@fortawesome/free-regular-svg-icons';
-function CartItem({ cart, index, onCheck, checked }) {
+import { VND } from '../../../helper';
+function CartItem({ cart, index, onCheck, checked, onDelete, onDecrease, onIncrease }) {
+    const formatDateTime = (dateTimeString) => {
+        const date = new Date(dateTimeString);
+        const options = {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false,
+        };
+        return new Intl.DateTimeFormat('vi-VN', options).format(date).replace(/\./g, '/');
+    };
     return (
         <>
             <div key={index} className={styles.cartItem}>
@@ -17,27 +31,33 @@ function CartItem({ cart, index, onCheck, checked }) {
                     <img
                         className={styles.imageItems}
                         alt=""
+                        src={`http://localhost:8086/api/post/${cart.listTourInCart.tourImageName}/image`}
                         // src={`http://localhost:8086/api/cart/upload/imageCart/${cart.id}`}
-                        src="https://i.pinimg.com/564x/01/16/37/011637a289e407972b469e57d3b069fd.jpg"
+                        // src="https://i.pinimg.com/564x/01/16/37/011637a289e407972b469e57d3b069fd.jpg"
                     />
                 </div>
                 <div className={styles.cartFrame}>
                     <section className={styles.cartSection}>
                         <span className={styles.headerCart}>
-                            <h2 className={styles.tourName}>{cart.productName}</h2>
+                            <h2 className={styles.tourName}>{cart.listTourInCart.tourName}</h2>
                         </span>
                         <div className={styles.bodyCart}>
                             <ul className={styles.contentCart}>
-                                <li className={styles.contentCartItem}>Nhà cung cấp : {cart.supplier}</li>
-                                <li className={styles.contentCartItem}>Tour : {cart.day_tour}</li>
-                                <li className={styles.contentCartItem}>Địa điểm : {cart.location}</li>
-                                <li className={styles.contentCartItem}>Ngày khởi hành : {cart.check_in_date}</li>
-                                <li className={styles.contentCartItem}>Dịch vụ : {cart.service_tour}</li>
+                                <li className={styles.contentCartItem}>
+                                    Supplier : {cart.listTourInCart.fullNameSupplier}
+                                </li>
+                                {/* <li className={styles.contentCartItem}>Địa điểm : {cart.location}</li> */}
+                                <li className={styles.contentCartItem}>
+                                    Check in date : {formatDateTime(cart.listTourInCart.startTime)}
+                                </li>
+                                <li className={styles.contentCartItem}>
+                                    Check out date : {formatDateTime(cart.listTourInCart.endTime)}
+                                </li>
                             </ul>
                             <FontAwesomeIcon
                                 icon={faTrashCan}
                                 className={styles.iconTrash}
-                                // onClick={() => handleDelete(cart.yourBookingId, cart.id)}
+                                onClick={() => onDelete(cart.cartItemId)}
                             />
                         </div>
                     </section>
@@ -46,17 +66,19 @@ function CartItem({ cart, index, onCheck, checked }) {
                             <FontAwesomeIcon
                                 icon={faMinus}
                                 className={styles.iconMinus}
-                                // onClick={() => handleDecrement(index, cart.yourBookingId, cart.id)}
+                                onClick={() => onDecrease(cart.cartItemId)}
                             />
                             <input className={styles.quantityCart} value={cart.quantity} readOnly />
                             <FontAwesomeIcon
                                 icon={faPlus}
                                 className={styles.iconPlus}
-                                // onClick={() => handleIncrement(index)}
+                                onClick={() => onIncrease(cart.cartItemId)}
                             />
                         </span>
-                        <span className={styles.cartPrice}>{cart.priceTour}₫</span>
-                        <span className={styles.totalPrice}>{cart.priceTour * cart.quantity}₫</span>
+                        <span className={styles.cartPrice}>{VND.format(cart.listTourInCart.price)}</span>
+                        <span className={styles.totalPrice}>
+                            {VND.format(cart.listTourInCart.price * cart.quantity)}₫
+                        </span>
                     </article>
                 </div>
             </div>

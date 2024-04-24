@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
+import swal from 'sweetalert';
 
 function CartHandler({ initialTotalPrice, initialCheckAllCart, initialCart }) {
     const [cartItems, setCartItems] = useState(initialCart);
@@ -31,7 +31,7 @@ function CartHandler({ initialTotalPrice, initialCheckAllCart, initialCart }) {
     const handleCheckOut = () => {
         if (totalPrice !== 0) {
         } else {
-            toast.warning('Payment cannot be made if the item is not available');
+            swal('Ops!!', 'Payment cannot be made if the item is not available', 'warning');
         }
     };
     const handleChangeMethodPayment = (value) => {

@@ -1,32 +1,216 @@
 .container {
-    margin-left: 10px;
+    // margin-left: 260px;
+    margin: auto;
 }
 
 .imageUser {
     height: 40px;
     width: 40px;
     border-radius: 50%;
+    margin-right: 10px;
 }
 
 .addCommentCard {
     border: 1px solid #333;
 }
 
-.addCommentGroup {
-    display: block;
-    .inputComment {
-        width: 100%;
+.commentEditBtn {
+    display: flex;
+    margin-left: -200px;
+    height: 40px;
+}
+.btn {
+    width: 80px;
+    height: 30px;
+    border: 1px solid #333;
+    border-radius: 8px;
+    margin: 5px;
+
+    &:hover {
+        background: #9ff1ff;
     }
 }
+.displayContentGroup {
+    display: flex;
+    height: 70%;
+    margin-top: 10px;
+    margin-left: 25px;
+    .ImageComment {
+        height: 95px;
+        max-width: 140px;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        gap: 2px;
+        margin-right: 10px;
+        img {
+            width: 100%;
+            height: 44px;
+            object-fit: cover;
+            border-radius: 5px;
+            transition: transform 0.3s ease;
+            &:hover {
+                transform: scale(1.2);
+            }
+        }
+    }
+    .inputComment {
+        border: 1px solid #333;
+        border-radius: 8px;
+        width: 100%;
+        padding: 5px;
+        margin-right: 10px;
+    }
+}
+.showAllButton {
+    width: 100%;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background-color: #ddd;
+    transition: transform 0.3s ease;
+    border-radius: 5px;
+    &:hover {
+        transform: scale(1.2);
+    }
+}
+.addCommentGroupActive {
+    display: block;
+    height: 70%;
+    margin-top: 15px;
+    .contentComment {
+        display: flex;
+    }
+    .displayImageCommentActive {
+        height: calc(100px);
+        display: flex;
+        width: 100%;
+        overflow-x: auto;
+        gap: 2px;
+        margin-right: 10px;
+        img {
+            width: 120px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
+            transition: transform 0.3s ease;
+            &:hover {
+                transform: scale(1.1);
+            }
+        }
+        .showAllButton {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background-color: #ddd;
+            transition: transform 0.3s ease;
 
-.commentCard {
+            &:hover {
+                transform: scale(1.2);
+            }
+        }
+    }
+    .inputComment {
+        border: 1px solid #333;
+        border-radius: 8px;
+        width: 100%;
+        padding: 5px;
+        margin-right: 10px;
+    }
+}
+.commentCardActive {
     background: #f5fdfc;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     // border: 1px solid #333;
-    margin: 5px;
+    margin-bottom: 8px;
     border-radius: 8px;
-    padding: 5px;
-
+    padding: 8px;
+    width: 100%;
+    height: 240px;
+    .CommentInfo {
+        display: flex;
+        position: relative;
+        justify-content: space-between;
+        .userInfocomment {
+            display: flex;
+            .headerCommentCard {
+                display: block;
+            }
+        }
+    }
+    .addCommentHeader {
+        display: flex;
+        justify-content: space-between;
+        .addCommentInfo {
+            display: flex;
+            margin-left: 10px;
+        }
+    }
+    .commentBtn {
+        display: flex;
+        justify-content: flex-end;
+        .btn {
+            width: 110px;
+            height: 30px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        .btnSubmit {
+            &:hover {
+                background: #9ff1ff;
+            }
+        }
+        .btnCancel {
+            background: #affcf3;
+            &:hover {
+                background: #ff8282;
+            }
+        }
+    }
+}
+.addCommentGroup {
+    display: flex;
+    .contentComment {
+        width: 100%;
+        display: flex;
+        .inputComment {
+            border: 1px solid #333;
+            border-radius: 8px;
+            width: 100%;
+            padding: 5px;
+            margin-right: 10px;
+            height: 90px;
+            margin-top: 5px;
+        }
+    }
+}
+.ratingAndUsername {
+    padding-left: 5px;
+}
+.commentCard {
+    background: #f5fdfc;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    margin-bottom: 8px;
+    border-radius: 8px;
+    padding: 8px;
+    width: 100%;
+    height: calc(160px);
+    .CommentInfo {
+        display: flex;
+        position: relative;
+        justify-content: space-between;
+        .userInfocomment {
+            display: flex;
+            .headerCommentCard {
+                display: block;
+            }
+        }
+    }
     .addCommentHeader {
         display: flex;
         .addCommentInfo {
@@ -40,12 +224,143 @@
             width: 110px;
             height: 30px;
             border: 1px solid #333;
-            border-radius: 8px;
+            border-radius: 5px;
             margin: 5px;
+        }
+        .btnSubmit {
+            &:hover {
+                background: #9ff1ff;
+            }
+        }
+        .btnCancel {
+            background: #affcf3;
+            &:hover {
+                background: #ff8282;
+            }
         }
     }
 }
-
+.commentCardAdd {
+    background: #f5fdfc;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    margin-bottom: 8px;
+    border-radius: 8px;
+    padding: 8px;
+    width: 100%;
+    height: calc(160px);
+    .CommentInfo {
+        display: flex;
+        position: relative;
+        justify-content: space-between;
+        .userInfocomment {
+            display: flex;
+            .headerCommentCard {
+                display: block;
+            }
+        }
+    }
+    .addCommentHeader {
+        display: flex;
+        justify-content: space-between;
+        .addCommentInfo {
+            display: flex;
+            margin-left: 10px;
+        }
+    }
+    .commentBtn {
+        display: flex;
+        justify-content: flex-end;
+        .btn {
+            width: 110px;
+            height: 30px;
+            border: 1px solid #333;
+            border-radius: 5px;
+            margin: 5px;
+        }
+        .btnSubmit {
+            &:hover {
+                background: #9ff1ff;
+            }
+        }
+        .btnCancel {
+            background: #affcf3;
+            &:hover {
+                background: #ff8282;
+            }
+        }
+    }
+}
 .footerCommentCard {
     display: flex;
+}
+/* CSS custom của bạn */
+
+.commentDropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdownIcon {
+    cursor: pointer;
+}
+
+.dropdownContent {
+    display: none;
+    position: absolute;
+    background-color: #fff;
+    min-width: 100px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    border-radius: 5px;
+}
+.commentDropdown:hover .dropdownContent {
+    display: block;
+}
+.dropdownContent.show {
+    display: block;
+}
+
+.dropdownContent button {
+    width: 100%;
+    padding: 10px;
+    text-align: left;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.dropdownContent button:hover {
+    background-color: #f1f1f1;
+}
+
+.editActive {
+    .displayImageEditActive {
+        display: flex;
+        height: 60px;
+        gap: 2px;
+        width: 100%;
+        margin-bottom: 15px;
+        overflow-x: auto;
+        img {
+            width: 100px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 5px;
+            transition: transform 0.3s ease;
+            &:hover {
+                transform: scale(1.2);
+            }
+        }
+    }
+    .contentCommentEditActive {
+        display: flex;
+        .inputCommentEdit {
+            height: 100px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            width: 960px;
+            padding: 5px;
+            margin-right: 10px;
+        }
+    }
 }

@@ -23,6 +23,7 @@ function TableDestination() {
                     <tr>
                         <th>ID</th>
                         <th>Name</th>
+                        <th>Description</th>
                         <th>Address</th>
                         <th>Location</th>
                     </tr>
@@ -32,6 +33,7 @@ function TableDestination() {
                         <tr key={destination.desId}>
                             <td>{destination.desId}</td>
                             <td>{destination.desName}</td>
+                            <td>{destination.description}</td>
                             <td>{destination.desAddress}</td>
                             <td>{destination.location}</td>
                         </tr>

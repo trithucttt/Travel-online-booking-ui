@@ -5,7 +5,7 @@ const onlyHeader = ({ children }) => {
     return (
         <div className="layout">
             <Header />
-            <main>{children}</main>
+            <main className="pt-20">{children}</main>
         </div>
     );
 };

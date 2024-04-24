@@ -16,13 +16,13 @@ const SignUp = () => {
         password: '',
         conformPass: '',
     });
-    const [errors, setErrors] = useState({});
+    const [errors] = useState({});
 
-    const validateForm = () => {
-        // const validationErrors = Validation({ username, password });
-        // setErrors(validationErrors);
-        // return Object.keys(validationErrors).length === 0;
-    };
+    // const validateForm = () => {
+    //     // const validationErrors = Validation({ username, password });
+    //     // setErrors(validationErrors);
+    //     // return Object.keys(validationErrors).length === 0;
+    // };
     const handleSubmit = async (e) => {
         e.preventDefault();
         // console.log('Register Info:', register);

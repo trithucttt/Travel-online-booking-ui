@@ -3,6 +3,9 @@ function validateDestinationData(newDestination) {
     if (!newDestination.destinationName.trim()) {
         errors.destinationName = 'Destination Name is required';
     }
+    if (!newDestination.description.trim()) {
+        errors.description = 'Description Name is required';
+    }
     if (typeof newDestination.wardId === 'string' && !newDestination.wardId.trim()) {
         errors.wardId = 'Ward is required';
     }

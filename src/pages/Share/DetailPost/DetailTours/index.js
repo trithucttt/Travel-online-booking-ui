@@ -1,29 +1,41 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar } from '@fortawesome/free-regular-svg-icons';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ToastContainer } from 'react-toastify';
 import { faCarrot, faLocationDot, faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
 
 import styles from './DetailTour.module.scss';
 import { VND } from '../../../../helper';
 import Comment from './Comment';
-import DetailTourHandler from './DetailTourHandler';
+// import DetailTourHandler from './DetailTourHandler';
 import { useParams } from 'react-router-dom';
 import apiService from '../../../../Components/ApiService/index';
 import { useSelector } from 'react-redux';
 import { selectedPost } from '../../../../store/postSlice';
 import { formatTimeDifference } from '../../../../helper/formatTimeDifference';
+import { jwtDecode } from 'jwt-decode';
+import { toast } from 'react-toastify';
+import swal from 'sweetalert';
 function DetailTour() {
     const [rating] = useState(4.5);
     const [detailTour, setDetailTour] = useState({});
+    const [showComment, setShowComment] = useState(true);
+    const [checkRole, setCheckRole] = useState(false);
+    const [quantity, setQuantity] = useState(1);
+    const totalPriceRef = useRef(null);
     const { id } = useParams();
+    const token = localStorage.getItem('token') || null;
+    const headers = {
+        Authorization: `Bearer ${token}`,
+    };
     const { postId } = useSelector(selectedPost);
-    console.log('detail tour get post id', postId);
-    console.log('detail tour get id', id);
-    const { quantity, handleMinusQuantity, handlePlusQuantity, addTocart, totalPriceRef } = DetailTourHandler({
-        initialQuantity: 1,
-        maxQuantity: detailTour.quantityTour,
-    });
+    const tourId = parseInt(id, 10);
+    // console.log('detail tour get post id', postId);
+    // console.log('detail tour get id', id);
+    // const { quantity, handleMinusQuantity, handlePlusQuantity, addToCart, totalPriceRef } = DetailTourHandler({
+    //     initialQuantity: 1,
+    //     maxQuantity: detailTour.quantityTour,
+    // });
     const formatDateTime = (dateTimeString) => {
         const date = new Date(dateTimeString);
         const options = {
@@ -38,7 +50,6 @@ function DetailTour() {
         return new Intl.DateTimeFormat('vi-VN', options).format(date).replace(/\./g, '/');
     };
     const fetchDetailTour = async () => {
-        const tourId = parseInt(id, 10);
         const data = await apiService.request('get', `tour/detail/${postId}/${tourId}`);
         console.log(data);
         setDetailTour(data);
@@ -46,16 +57,57 @@ function DetailTour() {
 
     useEffect(() => {
         fetchDetailTour();
-    }, []);
 
+        if (token !== null) {
+            const parseToken = jwtDecode(token);
+            const role = parseToken.role;
+            if (role === 'BUSINESS') setCheckRole(false);
+            if (role === 'USER') setCheckRole(true);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    const handleMinusQuantity = () => {
+        if (quantity < 2) {
+            toast.warning('Quantity cannot be less than 1');
+        } else {
+            setQuantity(quantity - 1);
+        }
+    };
+
+    const handlePlusQuantity = () => {
+        if (quantity > detailTour?.quantityTour - 1) {
+            toast.warning(`Quantity cannot be more than ${detailTour?.quantityTour}`);
+        } else {
+            setQuantity(quantity + 1);
+        }
+    };
+    const addToCart = async () => {
+        const totalPrice = totalPriceRef.current.innerText;
+        console.log('Total Price: ', totalPrice);
+        const postIdPart = parseInt(postId, 10);
+        const addToCartRequest = {
+            postId: postIdPart,
+            tourId: tourId,
+            quantity: quantity,
+        };
+        console.log('add to cart data ', addToCartRequest);
+        const data = await apiService.request('post', 'cart/add', addToCartRequest, headers);
+        if (data?.responseCode === '200') {
+            swal('OK!', data?.message, 'success');
+            // console.log(data?.message);
+        } else {
+            swal('Warning!', data?.message, 'warning');
+            // console.log(data?.message);
+        }
+    };
     return (
         <div className={styles.container}>
             <ToastContainer />
             <div className={styles.detailTour}>
                 <div className={styles.detailImage}>
                     <img
-                        src="https://i.pinimg.com/236x/6e/b7/d6/6eb7d6fb1a76278713c770b2de0754fd.jpg"
-                        alt="detail-imagee"
+                        src={`http://localhost:8086/api/post/${detailTour.imageTour}/image`}
+                        alt={detailTour.imageTour}
                         className={styles.imageTourDetail}
                     />
                 </div>
@@ -132,44 +184,51 @@ function DetailTour() {
                     <p className={styles.totalPrice} ref={totalPriceRef}>
                         Total price: {VND.format(detailTour.price * quantity)}
                     </p>
-                    <button className={styles.btn} onClick={addTocart}>
+                    <button className={styles.addToCart} onClick={addToCart} disabled={!checkRole}>
                         Add To Cart
                     </button>
                 </div>
             </div>
-            <div>{detailTour.description}</div>
+
+            <button onClick={() => setShowComment(!showComment)}>
+                {showComment && 'ImageDestination' ? 'ImageDestination' : 'Comment'}
+            </button>
             <div className={styles.tabDetail}>
-                <div className={styles.introduceTour}>
-                    <div className={styles.listImageDes}>
-                        {detailTour.destiationDtoList &&
-                            detailTour.destiationDtoList.map((item, index) => (
-                                <figure key={index} className={styles.figureStyle}>
-                                    <img
-                                        src={`http://localhost:8086/api/destination/${item.desId}/image`}
-                                        alt="detail-DestinationImage"
-                                        className={styles.imageDestinationDetail}
-                                    />
-                                    <div>
-                                        <figcaption className={styles.figcaptionDesName}>{item.desName}</figcaption>
-                                        <figcaption className={styles.figcaptionLocation}>
-                                            <FontAwesomeIcon icon={faLocationDot} className={styles.iconLocationDes} />
-                                            Location EN: {item.desAddress}
-                                        </figcaption>
-                                        {/* <figcaption className={styles.figcaptionLocationVn}>
-                                            <FontAwesomeIcon
-                                                icon={faLocationDot}
-                                                className={styles.iconLocationDesVn}
-                                            />
-                                            Location VN: {item.location}
-                                        </figcaption> */}
-                                    </div>
-                                </figure>
-                            ))}
+                {showComment && (
+                    <div className={styles.commentTour}>
+                        <Comment commentList={detailTour.commentList} postId={postId} tourId={detailTour.tour_id} />
                     </div>
-                </div>
-                <div className={styles.commentTour}>
-                    <Comment commentList={detailTour.commentList} postId={postId} tourId={detailTour.tour_id} />
-                </div>
+                )}
+                {!showComment && (
+                    <div className={styles.introduceTour}>
+                        <div>{detailTour.description}</div>
+                        <div className={styles.listImageDes}>
+                            {detailTour.destiationDtoList &&
+                                detailTour.destiationDtoList.map((item, index) => (
+                                    <figure key={index} className={styles.figureStyle}>
+                                        <img
+                                            src={`http://localhost:8086/api/destination/${item.desId}/image`}
+                                            alt="detail-DestinationImage"
+                                            className={styles.imageDestinationDetail}
+                                        />
+                                        <div>
+                                            <figcaption className={styles.figcaptionDesName}>{item.desName}</figcaption>
+                                            <figcaption className={styles.figcaptionLocation}>
+                                                <FontAwesomeIcon
+                                                    icon={faLocationDot}
+                                                    className={styles.iconLocationDes}
+                                                />
+                                                Location EN: {item.desAddress}
+                                            </figcaption>
+                                            <figcaption className={styles.figcaptionLocationVn}>
+                                                Description: {item.description}
+                                            </figcaption>
+                                        </div>
+                                    </figure>
+                                ))}
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

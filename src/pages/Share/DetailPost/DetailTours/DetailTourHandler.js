@@ -21,7 +21,7 @@ const DetailTourHandler = ({ initialQuantity, maxQuantity }) => {
             setQuantity(quantity + 1);
         }
     };
-    const addTocart = () => {
+    const addToCart = () => {
         const totalPrice = totalPriceRef.current.innerText;
         console.log('Total Price: ', totalPrice);
     };
@@ -29,7 +29,7 @@ const DetailTourHandler = ({ initialQuantity, maxQuantity }) => {
         quantity,
         handleMinusQuantity,
         handlePlusQuantity,
-        addTocart,
+        addToCart,
         totalPriceRef,
     };
 };

@@ -11,7 +11,8 @@ function PostItem({ item, postIndex, formatDateTime, handleDetail, handleImageCl
                     <div className={styles.imageOwnerPost}>
                         <img
                             className={styles.imageUser}
-                            src="https://i.pinimg.com/564x/a3/c5/94/a3c5941991524fc63d5d1657f696cbf0.jpg"
+                            src={item.avatarUser}
+                            // src="https://i.pinimg.com/564x/a3/c5/94/a3c5941991524fc63d5d1657f696cbf0.jpg"
                             alt="userAvatar"
                         />
                     </div>

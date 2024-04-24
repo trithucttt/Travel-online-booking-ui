@@ -9,6 +9,7 @@ function Home() {
     const [searchPost, setSearchPost] = useState([]);
     // const [sortPost, setSortPost] = useState([]);
     // const [valueSort, setValueSort] = useState('');
+    localStorage.removeItem('listCartItems');
     return (
         <div>
             <div className={styles.bannerItem}>

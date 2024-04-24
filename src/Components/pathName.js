@@ -3,8 +3,10 @@ export const routeKey = {
     login: '/login',
     signup: '/signup',
     detailPost: '/post/detail/:id',
-    profileOther: '/profile/business/:userId',
+    profileOwner: '/profile',
     detailTour: '/tour/:id',
     ListPost: '/posts',
-    profileUser: '/profile',
+    profileUser: '/profile/:userId',
+    cart: '/cart',
+    payment: '/payment',
 };

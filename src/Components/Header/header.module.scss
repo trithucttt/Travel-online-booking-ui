@@ -1,0 +1,93 @@
+.container {
+    width: 100%;
+    height: 80px;
+    display: flex;
+    justify-content: space-between;
+    background-color: rgba(0, 0, 0, 0.5);
+    align-items: center;
+    padding: 10px 20px;
+    position: fixed;
+    z-index: 100000;
+    box-sizing: border-box;
+    .logo {
+        width: 50px;
+        height: 40px;
+    }
+    .menu {
+        display: flex;
+        gap: 20px;
+        .iconUser {
+            padding-top: 15px;
+            cursor: pointer;
+            font-size: 20px;
+            outline: none;
+        }
+        .avatarUser {
+            margin-top: 10px;
+            height: 30px;
+            width: 30px;
+            border-radius: 50%;
+        }
+        .cart {
+            padding-top: 15px;
+            cursor: pointer;
+            font-size: 20px;
+            color: rgb(255, 181, 83);
+            outline: none;
+        }
+    }
+    .btnMenu {
+        cursor: pointer;
+        padding: 10px;
+        .iconMenuBar {
+            outline: none;
+            font-size: 17px;
+        }
+    }
+}
+.iconClose {
+    cursor: pointer;
+    font-size: 25px;
+    font-weight: 500;
+    color: red;
+    outline: none;
+}
+.listMenu {
+    width: 300px;
+    height: 1000px;
+    position: absolute;
+    background-color: rgb(255, 255, 255);
+    right: -500px;
+    // display: none;
+    top: 0;
+    transition: 0.5s all;
+    z-index: 100000;
+    box-sizing: border-box;
+}
+.active {
+    right: 0;
+    // display: block;
+    ul {
+        text-align: center;
+        li {
+            margin: 20px;
+            &:hover {
+                color: aquamarine;
+                font-weight: 500;
+            }
+        }
+    }
+}
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(255, 255, 255, 0.6);
+    width: 100%;
+    height: 100%;
+    transition: 0.5s;
+    display: none;
+}
+.overlayActive {
+    display: block;
+}

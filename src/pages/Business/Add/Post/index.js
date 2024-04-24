@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 
 import apiService from '../../../../Components/ApiService';
 import validatePostData from './validatePostData';
+import swal from 'sweetalert';
 function AddPost() {
     const getToDay = () => {
         const today = new Date();
@@ -13,13 +14,17 @@ function AddPost() {
     };
     const getEndDay = () => {
         const today = new Date();
-        const endDate = new Date(today.setDate(today.getDate() + 20));
+        const endDate = new Date(today.setMonth(today.getMonth() + 2));
         const localEndDate = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000);
         return localEndDate.toISOString().slice(0, 16);
     };
     const [listTour, setListTour] = useState([]);
     const [tour, setTour] = useState([]);
-    const [listTourError, setListTourError] = useState(false);
+    const token = localStorage.getItem('token') || null;
+    const headers = {
+        Authorization: `Bearer ${token}`,
+    };
+    const [, setListTourError] = useState(false);
     const [newPost, setNewPost] = useState({
         titlePost: '',
         startDay: getToDay(),
@@ -35,7 +40,7 @@ function AddPost() {
                     Authorization: `Bearer ${token}`,
                 };
                 const data = await apiService.request('get', 'business/tours', null, headers);
-                console.log(data);
+                // console.log(data);
                 setTour(data);
             } catch (error) {
                 console.log(error);
@@ -46,27 +51,12 @@ function AddPost() {
 
     const handleValuePostChange = (e, fieldName) => {
         const { value } = e.target;
-        console.log(`Updating ${fieldName} to ${value}`);
+        // console.log(`Updating ${fieldName} to ${value}`);
         setNewPost((prevValues) => ({
             ...prevValues,
             [fieldName]: value,
         }));
-        console.log(newPost);
-    };
-    const [quantity, setQuantity] = useState(0);
-    const handleQuantityChange = (increment) => {
-        let newQuantity = increment ? quantity + 0.1 : quantity - 0.1;
-        newQuantity = Math.round(newQuantity * 10) / 10;
-        if (newQuantity < 0) {
-            alert('Quantity cannot be less than 0.1');
-            return;
-        }
-        if (newQuantity > 0.9) {
-            alert('Quantity cannot be more than 0.9');
-            return;
-        }
-        setQuantity(newQuantity);
-        setNewPost((pre) => ({ ...pre, discount: newQuantity }));
+        // console.log(newPost);
     };
 
     const handleAddTour = () => {
@@ -79,19 +69,22 @@ function AddPost() {
                 const newListTour = {
                     id: selectTour.id,
                     title: selectTour.title,
+                    quantity: 0,
+                    discount: 0.0,
+                    dayTour: 0,
                 };
                 // console.log('newListTour', newListTour);
                 setListTour((pre) => [...pre, newListTour]);
-                console.log('listTour', listTour);
+                // console.log('listTour', listTour);
             } else {
                 alert('Tour is ready exist');
             }
         }
 
-        setNewPost((pre) => ({
-            ...pre,
-            tourId: listTour,
-        }));
+        // setNewPost((pre) => ({
+        //     ...pre,
+        //     tourId: listTour,
+        // }));
     };
 
     const handleTourDetail = (index, fieldName, value) => {
@@ -107,12 +100,40 @@ function AddPost() {
     const handleRemoveTour = (tourId) => {
         setListTour((pre) => pre.filter((tour) => tour.id !== tourId));
     };
-    const handleSavePost = () => {
+    const handleSavePost = async () => {
         const validateErrors = validatePostData(newPost, listTour);
         console.log(validateErrors);
         setListTourError(true);
         if (Object.keys(validateErrors).length === 0) {
-            console.log('No validation errors', newPost);
+            // console.log('No validation newPost', newPost);
+            // console.log('No validation listTour', listTour);
+
+            const tourData = listTour?.map((tourItem) => ({
+                tourId: tourItem.id,
+                quantity: parseInt(tourItem.quantity),
+                discount: parseFloat(tourItem.discount),
+                dayTour: parseInt(tourItem.dayTour),
+            }));
+            const addPostRequest = {
+                titlePost: newPost.titlePost,
+                startTimePost: newPost.startDay,
+                endTimePost: newPost.endDay,
+                addPostTourRequests: tourData,
+            };
+            console.table('No validation addPostRequest', addPostRequest);
+            const data = await apiService.request('post', 'business/post/save', addPostRequest, headers);
+            if (data.responseCode === '200') {
+                swal('Success', data.message, 'success');
+                setNewPost({
+                    titlePost: '',
+                    startTimePost: getToDay(),
+                    endTimePost: getEndDay(),
+                    tourId: '',
+                });
+                setListTour('');
+            } else {
+                swal('Failed', data.message, 'error');
+            }
         } else {
             setErrors(validateErrors);
         }

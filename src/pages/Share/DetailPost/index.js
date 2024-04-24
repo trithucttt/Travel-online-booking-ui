@@ -5,10 +5,8 @@ import withHeader from '../../../Components/Layout/withHeader';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faComment, faPlane, faStar, faTag } from '@fortawesome/free-solid-svg-icons';
 import { useLocation, useParams } from 'react-router-dom';
-import apiService from '../../../Components/ApiService';
 import axios from 'axios';
 import Tours from './Tours';
-import ReactImageTooltip from 'react-image-tooltip';
 
 function DetailPost() {
     const location = useLocation();
@@ -45,6 +43,7 @@ function DetailPost() {
     };
     useEffect(() => {
         fetchDetailPost();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     return (
         <div className={styles.postDetail}>
@@ -52,17 +51,14 @@ function DetailPost() {
                 <div className={styles.headerContent}>
                     <div className={styles.ownerPost}>
                         <div className={styles.imageOwnerPost}>
-                            <ReactImageTooltip
-                                image="https://i.pinimg.com/564x/1a/84/35/1a8435b262f70dc441a52bf15a9c620d.jpg"
-                                effect="solid"
-                                place="left"
-                            >
-                                <img
-                                    className={styles.imageUser}
-                                    src="https://i.pinimg.com/564x/1a/84/35/1a8435b262f70dc441a52bf15a9c620d.jpg"
-                                    alt="userAvatar"
-                                />
-                            </ReactImageTooltip>
+                            {/* <ReactImageTooltip src={detailData.avatarUser} effect="solid" place="left"> */}
+                            <img
+                                className={styles.imageUser}
+                                src={detailData.avatarUser}
+                                // src="https://i.pinimg.com/564x/1a/84/35/1a8435b262f70dc441a52bf15a9c620d.jpg"
+                                alt="userAvatar"
+                            />
+                            {/* </ReactImageTooltip> */}
                         </div>
                         <div className={styles.NameOwnerPost}>
                             <h3>{detailData.fullNameUser}</h3>
@@ -80,14 +76,14 @@ function DetailPost() {
                         <div className={styles.divBorder}>
                             <div className={styles.totalTour}>
                                 <FontAwesomeIcon icon={faPlane} />
-                                {/* <h2> {detailData.tourDtoList.length}</h2> */}
+                                {detailData?.tourDtoList && <h2> {detailData?.tourDtoList.length}</h2>}
                                 <p>Tours</p>
                             </div>
                         </div>
                         <div className={styles.divBorder}>
                             <div className={styles.avgRating}>
                                 <FontAwesomeIcon icon={faStar} />
-                                <h2> {detailData.rate}</h2>
+                                <h2> 4.5</h2>
                                 <p>Start</p>
                             </div>
                         </div>

@@ -1,30 +1,29 @@
-import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStar, faMapLocation, faLocationDot, faClock, faCalendar } from '@fortawesome/free-solid-svg-icons';
+import { faStar, faMapLocation, faLocationDot } from '@fortawesome/free-solid-svg-icons';
 import styles from './Tours.module.scss'; // Adjust the import path according to your file structure
 import { VND } from '../../../../helper/index';
 import { useNavigate } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip';
 import { routeKey } from '../../../../Components/pathName';
 import { useDispatch } from 'react-redux';
-import postSlice, { PostIdFromTour } from '../../../../store/postSlice';
+import { PostIdFromTour } from '../../../../store/postSlice';
 
 const Tours = ({ tourDtoList, postId }) => {
     const navigate = useNavigate();
     const dispath = useDispatch();
-    const formatDateTime = (dateTimeString) => {
-        const date = new Date(dateTimeString);
-        const options = {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            // hour: '2-digit',
-            // minute: '2-digit',
-            // second: '2-digit',
-            // hour12: false,
-        };
-        return new Intl.DateTimeFormat('vi-VN', options).format(date).replace(/\./g, '/');
-    };
+    // const formatDateTime = (dateTimeString) => {
+    //     const date = new Date(dateTimeString);
+    //     const options = {
+    //         year: 'numeric',
+    //         month: '2-digit',
+    //         day: '2-digit',
+    //         // hour: '2-digit',
+    //         // minute: '2-digit',
+    //         // second: '2-digit',
+    //         // hour12: false,
+    //     };
+    //     return new Intl.DateTimeFormat('vi-VN', options).format(date).replace(/\./g, '/');
+    // };
     const handleNavigateDetailTour = (id) => {
         // alert(postId);
         dispath(PostIdFromTour(postId));
@@ -50,8 +49,8 @@ const Tours = ({ tourDtoList, postId }) => {
                             <div className={styles.cardImage}>
                                 <img
                                     className={styles.imageItem}
-                                    src="https://i.pinimg.com/564x/ce/38/fd/ce38fdcadc4bd245c13ae796ce51c597.jpg"
-                                    alt="Tour Can Tho"
+                                    src={`http://localhost:8086/api/post/${tour.imageTour}/image`}
+                                    alt={tour.imageTour}
                                 />
                             </div>
                             <div className={styles.cardInfo}>

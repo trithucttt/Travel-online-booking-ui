@@ -1,8 +1,9 @@
-import styles from './AddDestination.module.scss';
 import Select from 'react-select';
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import apiService from '../../../../Components/ApiService';
 import validateDestinationData from './validationDestinationData';
+import styles from './AddDestination.module.scss';
 function Add() {
     const [errors, setErrors] = useState({});
     const [fileImage, setFileImage] = useState([]);
@@ -12,11 +13,14 @@ function Add() {
     const [district, setDistrict] = useState([]);
     const [ward, setWard] = useState([]);
     const [inputKey] = useState(Date.now());
+    const [imagePreviewUrl, setImagePreviewUrl] = useState('');
+
     const [newDestination, setNewDestination] = useState({
         image: '',
         destinationName: '',
         address: '',
         wardId: '',
+        description: '',
     });
 
     useEffect(() => {
@@ -82,12 +86,36 @@ function Add() {
         console.log(newDestination);
     };
 
-    const handleSaveTour = () => {
+    const handleSaveTour = async () => {
         const validateErrors = validateDestinationData(newDestination);
         console.log(validateErrors);
+        const token = localStorage.getItem('token');
+        const headers = {
+            Authorization: `Bearer ${token}`,
+        };
         // console.log(listDestination.length);
         if (Object.keys(validateErrors).length === 0) {
-            console.log('No validation Error', newDestination);
+            const formData = new FormData();
+            formData.append('image', newDestination.image);
+            formData.append('destinationName', newDestination.destinationName);
+            formData.append('address', newDestination.address);
+            formData.append('wardId', newDestination.wardId);
+            formData.append('description', newDestination.description);
+            const data = await apiService.request('post', 'business/destination/save', formData, headers);
+            toast(data);
+            // console.log('No validation Error formData', formData);
+            // formData.forEach((value, key) => {
+            //     console.log(`Key: ${key}, Value: ${value}`);
+            // });
+            // console.log('No validation Error newDestination', newDestination);
+            setNewDestination({
+                image: '',
+                destinationName: '',
+                address: '',
+                wardId: '',
+                description: '',
+            });
+            setImagePreviewUrl('');
         } else {
             setErrors(validateErrors);
         }
@@ -101,6 +129,7 @@ function Add() {
             ...pre,
             image: selectedFile,
         }));
+        setImagePreviewUrl(URL.createObjectURL(selectedFile));
     };
 
     return (
@@ -117,6 +146,25 @@ function Add() {
                 />
             </div>
             {errors.destinationName && <div className={styles.error}>{errors.destinationName}</div>}
+            <div className={styles.formGroupTitle}>
+                <label className={styles.labelTitle}>Description:</label>
+                <textarea
+                    value={newDestination.description}
+                    className={`${styles.inputInfo} ${styles.inputTitle}`}
+                    placeholder="Enter Description"
+                    name="description"
+                    onChange={(e) => handleValueToursChange(e, 'description')}
+                />
+            </div>
+            {errors.description && <div className={styles.error}>{errors.description}</div>}
+            {imagePreviewUrl && (
+                <div className={styles.formGroupDate}>
+                    {/* anh duoc chon hien thi ơ day */}
+                    <div>
+                        {imagePreviewUrl && <img className={styles.imageUpload} src={imagePreviewUrl} alt="Preview" />}
+                    </div>
+                </div>
+            )}
             <div className={styles.formGroupDate}>
                 <div className={styles.endDay}>
                     <label className={styles.labelStartDay}>Image:</label>

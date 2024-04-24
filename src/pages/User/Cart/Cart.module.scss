@@ -1,6 +1,7 @@
 .containerCart {
     display: flex;
     height: 90vh;
+    // padding-top: 80px;
 
     .ownerCart {
         width: 30%;
@@ -57,7 +58,7 @@
             height: 15%;
             border-radius: 5px;
             display: flex;
-            background: #fcddef;
+            background: rgba(255, 184, 244, 0.2);
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
             // border: 1px solid #333;
             .paymentGroup {
@@ -70,6 +71,7 @@
             .groupCheckAll {
                 width: 30%;
                 display: flex;
+                user-select: none;
                 .checkAllCart {
                     transform: scale(1.2);
                     cursor: pointer;
@@ -82,6 +84,7 @@
                 color: rgb(0, 0, 0);
                 font-weight: 500;
                 font-style: italic;
+                user-select: none;
             }
             .btnCheckOut {
                 width: 30%;
@@ -112,6 +115,7 @@
         }
 
         .CartItem {
+            scrollbar-width: none;
             width: 100%;
             max-height: calc(75vh); /* 10% để trừ đi phần height của checkOutItem */
             overflow-y: auto;

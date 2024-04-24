@@ -6,9 +6,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
 function Tour({ ownerId, ownerTour }) {
-    console.log(ownerTour);
+    // console.log(ownerTour);
     const [searchValue, setSearchValue] = useState('');
-    console.log('tour get userId', ownerId);
+    // console.log('tour get userId', ownerId);
     const [tours, setTours] = useState();
     const fetchTour = async () => {
         const data = await apiService.request('get', `tour/${ownerId}`);
@@ -17,6 +17,7 @@ function Tour({ ownerId, ownerTour }) {
 
     useEffect(() => {
         fetchTour();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     return (
         <>

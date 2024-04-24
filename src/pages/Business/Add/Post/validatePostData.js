@@ -64,12 +64,12 @@ function validatePostData(newPost, listTour) {
         errors.startDay = 'Start time cannot be in the past';
     }
 
-    const minEndDate = new Date(today);
-    minEndDate.setDate(minEndDate.getDate() + 20);
+    const minEndDate = startDay;
+    minEndDate.setMonth(minEndDate.getMonth() + 2);
     minEndDate.setHours(0, 0, 0, 0);
 
     if (endDay < minEndDate) {
-        errors.endDay = 'End time must be at least 20 days after today';
+        errors.endDay = 'End time must be at least 30 days after start day';
     }
 
     return errors;

@@ -19,18 +19,6 @@ function Post({ searchPost }) {
     useEffect(() => {
         console.log('get search value in post component', searchPost);
     }, [searchPost]);
-    /**----------------------handler--------------------------- */
-    const fetchPost = async () => {
-        try {
-            const data = await apiService.request('get', 'post/list');
-            // console.log(data);
-            // setPosts(data);
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
-    /**----------------------handler--------------------------- */
 
     const handleDetail = (id) => {
         // alert(id);
@@ -39,7 +27,7 @@ function Post({ searchPost }) {
 
     const handleRenderOwnerPost = (userId) => {
         // alert(userId);
-        navigate(`${routeKey.profileOther.replace(':userId', userId)}`);
+        navigate(`${routeKey.profileUser.replace(':userId', userId)}`);
     };
 
     const handleImageClick = (postIndex, imageIndex) => {
@@ -86,7 +74,7 @@ function Post({ searchPost }) {
             setPosts(sortedPosts);
         }
         if (value === 'Default') {
-            fetchPost();
+            // fetchPost();
         }
     };
     useEffect(() => {
@@ -111,7 +99,7 @@ function Post({ searchPost }) {
                 console.log(error);
             }
         };
-        fetchPost();
+        // fetchPost();
         searchAndPagination();
         // console.log('get search value in post component', searchPost);
     }, [searchPost, sizeData, currentPage]);

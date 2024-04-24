@@ -4,12 +4,14 @@ import { faX } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useState } from 'react';
 import apiService from '../../../../Components/ApiService';
 import validateTourData from './vadilationTour';
+import swal from 'sweetalert';
 function Add() {
     const [listDestination, setListDestination] = useState([]);
     const [destination, setDestination] = useState([]);
     const [errors, setErrors] = useState({});
     const [listDesErrors, setLisDesError] = useState(false);
     const [inputKey] = useState(Date.now());
+    const [imagePreviewUrl, setImagePreviewUrl] = useState('');
     const [newTour, setNewTour] = useState({
         image: '',
         titleTour: '',
@@ -26,7 +28,7 @@ function Add() {
                     Authorization: `Bearer ${token}`,
                 };
                 const data = await apiService.request('get', 'business/destination', null, headers);
-                console.log(data);
+                // console.log(data);
                 setDestination(data);
             } catch (error) {
                 console.log(error);
@@ -60,10 +62,15 @@ function Add() {
                 alert('Tour is ready exist');
             }
         }
-        setNewTour((pre) => ({
-            ...pre,
-            destinationId: listDestination,
-        }));
+        // setNewTour((prevTour) => {
+        //     const updatedDestinationIds = Array.from(new Set([...prevTour.destinationId, ...listDestination]));
+        //     return {
+        //         ...prevTour,
+        //         destinationId: updatedDestinationIds,
+        //     };
+        // });
+        // console.log(listDestination);
+        // console.log(newTour);
     };
     const handleRemoveTour = (destinationId) => {
         // console.log(listTour);
@@ -71,12 +78,48 @@ function Add() {
         setListDestination((pre) => pre.filter((tour) => tour.id !== destinationId));
     };
 
-    const handleSaveTour = () => {
+    const handleSaveTour = async () => {
         const validateErrors = validateTourData(newTour, listDestination);
         console.log(validateErrors);
         setLisDesError(true);
         if (Object.keys(validateErrors).length === 0) {
             console.log('No validation Error', newTour);
+            const formData = new FormData();
+            formData.append('titleTour', newTour.titleTour);
+            formData.append('price', newTour.price);
+            formData.append('description', newTour.description);
+            formData.append('image', newTour.image);
+
+            if (listDestination && listDestination.length > 0) {
+                const filterDestinationId =
+                    listDestination &&
+                    listDestination?.filter((item) => typeof item === 'object' && item.id).map((item) => item.id);
+                filterDestinationId.forEach((id) => {
+                    formData.append('destinationId', id);
+                });
+            }
+            const token = localStorage.getItem('token');
+            const headers = {
+                Authorization: `Bearer ${token}`,
+            };
+            const data = await apiService.request('post', 'business/tour/save', formData, headers);
+            if (data.responseCode === '200') {
+                // swal('OK!', 'Your comment has been Edited!', 'success');
+                swal('OK!', 'Create New Tour Successfully', 'success');
+                console.log(data.message);
+                setNewTour({
+                    image: '',
+                    price: '',
+                    titleTour: '',
+                    destinationId: '',
+                    description: '',
+                });
+                setImagePreviewUrl('');
+                setListDestination('');
+            } else {
+                swal('Error!', 'Create New Tour Failed', 'error');
+                console.log(data.message);
+            }
         } else {
             setErrors(validateErrors);
         }
@@ -89,6 +132,7 @@ function Add() {
             ...pre,
             image: selectedFile,
         }));
+        setImagePreviewUrl(URL.createObjectURL(selectedFile));
     };
     return (
         <div className={styles.container}>
@@ -110,6 +154,7 @@ function Add() {
                     <textarea
                         className={`${styles.inputInfo} ${styles.inputStartDay}`}
                         value={newTour.description}
+                        placeholder="Enter description Tour"
                         onChange={(e) => handleValueToursChange(e, 'description')}
                     />
                 </div>
@@ -120,11 +165,22 @@ function Add() {
                         type="number"
                         value={newTour.price}
                         name="price"
+                        placeholder="Enter price Tour"
                         className={`${styles.inputInfo} ${styles.inputEndDay}`}
                         onChange={(e) => handleValueToursChange(e, 'price')}
                     />
                 </div>
                 {errors.price && <div className={styles.error}>{errors.price}</div>}
+                {imagePreviewUrl && (
+                    <div className={styles.formGroupDate}>
+                        {/* anh duoc chon hien thi ơ day */}
+                        <div>
+                            {imagePreviewUrl && (
+                                <img className={styles.imageUpload} src={imagePreviewUrl} alt="Preview" />
+                            )}
+                        </div>
+                    </div>
+                )}
                 <div className={styles.endDay}>
                     <label className={styles.labelStartDay}>Image:</label>
                     <input

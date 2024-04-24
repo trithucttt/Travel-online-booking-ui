@@ -8,14 +8,17 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBackward } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-
+import { useDispatch } from 'react-redux';
+import { loginSuccess } from '../../../store/userSlice';
+// import jwt from 'jwt-decode'
+import { jwtDecode } from 'jwt-decode';
 const Login = () => {
     const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [rememberMe, setRememberMe] = useState(false);
     const [errors, setErrors] = useState({});
-
+    const dispatch = useDispatch();
     const validateForm = () => {
         const validationErrors = Validation({ username, password });
         setErrors(validationErrors);
@@ -25,9 +28,6 @@ const Login = () => {
         e.preventDefault();
 
         if (validateForm()) {
-            console.log('Username:', username);
-            console.log('Password:', password);
-            console.log('Remember me:', rememberMe);
             const sendApi = {
                 username: username,
                 password: password,
@@ -35,18 +35,17 @@ const Login = () => {
             console.log('sendApi:', sendApi);
             try {
                 const response = await axios.post('http://localhost:8086/api/auth/login', sendApi);
-                console.log(response.data);
                 const responseData = response.data;
-                // console.log('responseData', responseData);
                 const token = responseData.Data.token;
                 const role = responseData.Data.role;
-                console.log('token data', token);
+                const parsToken = jwtDecode(token);
                 localStorage.setItem('token', token);
                 localStorage.setItem('role', role);
+                dispatch(loginSuccess(parsToken.sub));
                 toast.success('Login successfully');
                 setTimeout(() => {
                     navigate('/');
-                }, 3000);
+                }, 1000);
             } catch (error) {
                 console.log(error);
             }

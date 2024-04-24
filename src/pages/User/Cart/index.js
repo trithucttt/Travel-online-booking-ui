@@ -3,66 +3,120 @@ import styles from './Cart.module.scss';
 import CartItem from './CartItem';
 import { VND } from '../../../helper';
 import { ToastContainer } from 'react-toastify';
-import CartHandler from './CartHandler';
+// import CartHandler from './CartHandler';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSquare, faSquareCheck } from '@fortawesome/free-regular-svg-icons';
-
+import swal from 'sweetalert';
+import { useEffect, useState } from 'react';
+import apiService from '../../../Components/ApiService';
+import { jwtDecode } from 'jwt-decode';
 function Cart() {
-    const cartData = [
-        {
-            id: 1,
-            productName: 'Tour 1',
-            supplier: 'Traveloka',
-            day_tour: '3',
-            location: 'Viet Nam',
-            service_tour: 'all service',
-            priceTour: 3333333,
-            quantity: 1,
-            check_in_date: '28-03-2024',
-        },
-        {
-            id: 2,
-            productName: 'Tour 1',
-            supplier: 'Traveloka',
-            day_tour: '3',
-            location: 'Viet Nam',
-            service_tour: 'all service',
-            priceTour: 3333333,
-            quantity: 2,
-            check_in_date: '28-03-2024',
-        },
-        {
-            id: 3,
-            productName: 'Tour 1',
-            supplier: 'Traveloka',
-            day_tour: '3',
-            location: 'Viet Nam',
-            service_tour: 'all service',
-            priceTour: 3333333,
-            quantity: 3,
-            check_in_date: '28-03-2024',
-        },
-        {
-            id: 4,
-            productName: 'Tour 1',
-            supplier: 'Traveloka',
-            day_tour: '3',
-            location: 'Viet Nam',
-            service_tour: 'all service',
-            priceTour: 3333333,
-            quantity: 4,
-            check_in_date: '28-03-2024',
-        },
-    ];
-    const {
-        cartItems,
-        checkAllCart,
-        totalPrice,
-        handleChangeMethodPayment,
-        handleCheckAllCart,
-        handleCheckItems,
-        handleCheckOut,
-    } = CartHandler({ initialTotalPrice: 0, initialCheckAllCart: false, initialCart: cartData });
+    // const {
+    //     cartItems,
+    //     checkAllCart,
+    //     totalPrice,
+    //     handleChangeMethodPayment,
+    //     handleCheckAllCart,
+    //     handleCheckItems,
+    //     handleCheckOut,
+    // } = CartHandler({ initialTotalPrice: 0, initialCheckAllCart: false, initialCart: cartData });
+    const [cartItems, setCartItems] = useState([]);
+    const [checkAllCart, setCheckAllCart] = useState(false);
+    const [totalPrice, setToltalPrice] = useState(0);
+    const token = localStorage.getItem('token') || null;
+    const headers = {
+        Authorization: `Bearer ${token}`,
+    };
+    useEffect(() => {
+        const total = cartItems.reduce((acc, item) => {
+            return item.checked ? acc + item.listTourInCart.price * item.quantity : acc;
+        }, 0);
+        setToltalPrice(total);
+    }, [cartItems, checkAllCart]);
+
+    const fetchCartInfo = async () => {
+        const res = await apiService.request('get', 'cart/info', null, headers);
+        if (res.responseCode === '200') {
+            setCartItems(res.data);
+            console.log(res.data);
+        } else {
+            swal('Ops!!', res.message, 'warning');
+        }
+    };
+    useEffect(() => {
+        fetchCartInfo();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    const handleCheckItems = (cartId) => {
+        // alert(cartId);
+        const newCart = cartItems.map((item) => {
+            if (item.cartItemId === cartId) {
+                return { ...item, checked: !item.checked };
+            }
+            return item;
+        });
+        setCartItems(newCart);
+        console.log(cartItems);
+    };
+    const handleCheckAllCart = () => {
+        setCheckAllCart(!checkAllCart);
+        const newCart = cartItems.map((item) => ({ ...item, checked: !checkAllCart }));
+        setCartItems(newCart);
+    };
+    const handleCheckOut = async () => {
+        const token = localStorage.getItem('token') || null;
+        const parsToken = jwtDecode(token);
+        if (totalPrice !== 0) {
+            const checkedCartIds = cartItems.filter((item) => item.checked).map((item) => item.cartItemId);
+            console.log('Checked out itemsID:', checkedCartIds);
+            const data = await apiService.request('get', 'cart/payment/createUrl', null, null, {
+                totalPrice: totalPrice,
+                username: parsToken.sub,
+            });
+            if (data.responseCode === '200') {
+                console.log(data.data);
+                localStorage.setItem('listCartItems', checkedCartIds);
+                const urlPayment = data.data;
+                window.location.href = urlPayment;
+            }
+        } else {
+            swal('Ops!!', 'Payment cannot be made if the item is not available', 'warning');
+        }
+    };
+    const handleChangeMethodPayment = (value) => {
+        alert(value);
+    };
+
+    const handleDelete = async (id) => {
+        const data = await apiService.request('delete', `cart/delete/${id}`);
+        if (data.responseCode === '200') {
+            swal('Success', data.message, 'success');
+            fetchCartInfo();
+        } else {
+            swal('Ops!!', data.message, 'warning');
+        }
+    };
+
+    const handleDecrement = async (id) => {
+        // alert(id);
+        const data = await apiService.request('put', `cart/decrease/${id}`);
+        if (data.responseCode === '200') {
+            swal('Success', data.message, 'success');
+            fetchCartInfo();
+        } else {
+            swal('Ops!!', data.message, 'warning');
+        }
+    };
+    const handleIncrement = async (id) => {
+        const data = await apiService.request('put', `cart/increase/${id}`);
+        if (data.responseCode === '200') {
+            swal('Success', data.message, 'success');
+            fetchCartInfo();
+        } else {
+            swal('Ops!!', data.message, 'warning');
+        }
+    };
+
     return (
         <>
             <div className={styles.containerCart}>
@@ -110,11 +164,14 @@ function Cart() {
                         {cartItems &&
                             cartItems.map((cart, index) => (
                                 <CartItem
-                                    key={cart.id}
+                                    key={cart.cartItemId}
                                     cart={cart}
                                     index={index}
-                                    onCheck={() => handleCheckItems(cart.id)}
+                                    onCheck={() => handleCheckItems(cart.cartItemId)}
                                     checked={cart.checked}
+                                    onDecrease={() => handleDecrement(cart.cartItemId)}
+                                    onIncrease={() => handleIncrement(cart.cartItemId)}
+                                    onDelete={() => handleDelete(cart.cartItemId)}
                                 />
                             ))}
                     </div>

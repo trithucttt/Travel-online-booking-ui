@@ -1,0 +1,80 @@
+.changePassContainer {
+    width: 100%;
+    // border: 1px solid #333;
+    margin-top: 10%;
+
+    .loginTitle {
+        text-align: center;
+        margin-bottom: 20px;
+        h1 {
+            font-weight: 800;
+        }
+        .renderSignUp {
+            color: #37c7e4;
+            text-decoration: none;
+        }
+    }
+    .changePass {
+        width: 30%;
+        margin: 0 auto;
+        text-align: center;
+        .formGroup {
+            margin: 5px;
+            .inputField {
+                border-color: #37c7e4;
+                height: 40px;
+                width: 280px;
+                border: 0.5px solid #37c7e4;
+                border-radius: 5px;
+                margin-bottom: 5px;
+                padding-left: 10px;
+                outline: none;
+                &:hover {
+                    border: 3px solid #37c7e4;
+                }
+            }
+        }
+        .checkboxGroup {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px;
+            .forgotPassword {
+                color: #37c7e4;
+                font-style: italic;
+                text-decoration: none;
+            }
+            .checkboxContainer {
+                .checkbox {
+                    margin-right: 3px;
+                    font-size: 1rem;
+                }
+            }
+        }
+        .buttonGroup {
+            padding-top: 20px;
+            .loginButton {
+                width: 100%;
+                border-radius: 5px;
+                background: #37c7e4;
+                height: 30px;
+                text-align: center;
+                margin: 5px;
+                border-color: #37c7e4;
+                font-weight: 600;
+                color: aliceblue;
+                &:hover {
+                    background: #458d9b;
+                }
+            }
+            .loginWithLink {
+                color: #333;
+                text-decoration: none;
+            }
+        }
+    }
+}
+
+.error {
+    color: red;
+    font-style: italic;
+}

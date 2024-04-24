@@ -6,7 +6,7 @@ import { Provider } from 'react-redux';
 import store from './store';
 import GlobalStyles from './Components/GlobalStyles';
 import { ToastContainer } from 'react-toastify';
-
+import 'react-image-lightbox/style.css';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <Provider store={store}>
