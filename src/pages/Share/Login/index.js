@@ -1,29 +1,33 @@
 import React, { useState } from 'react';
-
 import styles from './Login.module.scss';
 import Validation from './Validation';
 import { Form } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBackward } from '@fortawesome/free-solid-svg-icons';
-import axios from 'axios';
+import { faBackward, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../../../store/userSlice';
-// import jwt from 'jwt-decode'
 import { jwtDecode } from 'jwt-decode';
+import { routeKey } from '../../../Components/pathName';
+import apiService from '../../../Components/ApiService';
+import swal from 'sweetalert';
+
 const Login = () => {
     const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [rememberMe, setRememberMe] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const [errors, setErrors] = useState({});
     const dispatch = useDispatch();
+
     const validateForm = () => {
         const validationErrors = Validation({ username, password });
         setErrors(validationErrors);
         return Object.keys(validationErrors).length === 0;
     };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -33,41 +37,46 @@ const Login = () => {
                 password: password,
             };
             console.log('sendApi:', sendApi);
-            try {
-                const response = await axios.post('http://localhost:8086/api/auth/login', sendApi);
-                const responseData = response.data;
-                const token = responseData.Data.token;
-                const role = responseData.Data.role;
+            const response = await apiService.request('post', 'auth/new/login', sendApi);
+            if (response.responseCode === '200') {
+                const token = response.data.token;
+                const role = response.data.role;
                 const parsToken = jwtDecode(token);
                 localStorage.setItem('token', token);
                 localStorage.setItem('role', role);
+                localStorage.setItem('userId', parsToken.userId);
+                localStorage.setItem('username', username);
                 dispatch(loginSuccess(parsToken.sub));
-                toast.success('Login successfully');
+                toast.success(response.message, {
+                    position: toast.POSITION.BOTTOM_RIGHT,
+                    zIndex: 999999,
+                });
                 setTimeout(() => {
                     navigate('/');
                 }, 1000);
-            } catch (error) {
-                console.log(error);
+            } else {
+                swal('Ops!!!', response.message, 'error');
             }
         }
     };
+
     return (
         <>
             <div className={styles.buttonHeader}>
-                <button className={`${styles.btn} ${styles.btnBack}`} onClick={() => navigate('/')}>
-                    <FontAwesomeIcon icon={faBackward} /> Back
+                <button className={`${styles.btn} ${styles.btnBack}`} onClick={() => navigate(-1)}>
+                    <FontAwesomeIcon icon={faBackward} /> Trở về
                 </button>
-                <button className={`${styles.btn} ${styles.btnSignUp}`} onClick={() => navigate('/signup')}>
-                    Sign Up
+                <button className={`${styles.btn} ${styles.btnSignUp}`} onClick={() => navigate(routeKey.signup)}>
+                    Đăng ký
                 </button>
             </div>
             <div className={styles.loginContainer}>
                 <div className={styles.loginTitle}>
-                    <h1>Login to your account</h1>
+                    <h1>Đăng nhập tài khoản vào hệ thống</h1>
                     <p>
-                        Don't have an account yet?
-                        <Link className={styles.renderSignUp} to={'/signup'}>
-                            SignUp
+                        Bạn chưa có tài khoản?
+                        <Link className={styles.renderSignUp} to={routeKey.signup}>
+                            Đăng lý
                         </Link>
                     </p>
                 </div>
@@ -77,7 +86,7 @@ const Login = () => {
                             <Form.Control
                                 autoFocus={true}
                                 type="text"
-                                placeholder="Username"
+                                placeholder="Tên đăng nhập"
                                 className={styles.inputField}
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
@@ -85,35 +94,43 @@ const Login = () => {
                             {errors.username && <div className={styles.error}>{errors.username}</div>}
                         </div>
                         <div className={styles.formGroup}>
-                            <Form.Control
-                                type="password"
-                                placeholder="Password"
-                                className={styles.inputField}
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
+                            <div className={styles.passwordContainer}>
+                                <Form.Control
+                                    type={showPassword ? 'text' : 'password'}
+                                    placeholder="Mật khẩu"
+                                    className={styles.inputField}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                />
+                                <FontAwesomeIcon
+                                    icon={showPassword ? faEyeSlash : faEye}
+                                    className={styles.eyeIcon}
+                                    onClick={() => setShowPassword(!showPassword)}
+                                />
+                            </div>
                             {errors.password && <div className={styles.error}>{errors.password}</div>}
                         </div>
                         <div className={styles.checkboxGroup}>
                             <div className={styles.checkboxContainer}>
-                                <input
+                                {/* <input
                                     type="checkbox"
                                     id="rememberCheckbox"
                                     className={styles.checkbox}
                                     checked={rememberMe}
                                     onChange={(e) => setRememberMe(e.target.checked)}
                                 />
-                                <label className={styles.checkboxLabel}>Remember me</label>
+                                <label className={styles.checkboxLabel}>Nhớ tôi</label> */}
                             </div>
                             <div>
-                                <Link className={styles.forgotPassword}>Forgot your password?</Link>
+                                <Link to={routeKey.forgotPass} className={styles.forgotPassword}>
+                                    Quên mật khẩu?
+                                </Link>
                             </div>
                         </div>
                         <div className={styles.buttonGroup}>
                             <button type="submit" className={styles.loginButton}>
-                                Login
+                                Đăng nhập
                             </button>
-                            <Link className={styles.loginWithLink}>Login with?</Link>
                         </div>
                     </form>
                 </div>

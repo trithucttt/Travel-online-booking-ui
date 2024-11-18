@@ -4,6 +4,7 @@ import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import store from './store';
+import 'rc-slider/assets/index.css';
 import GlobalStyles from './Components/GlobalStyles';
 import { ToastContainer } from 'react-toastify';
 import 'react-image-lightbox/style.css';

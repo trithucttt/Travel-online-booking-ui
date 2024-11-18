@@ -3,7 +3,7 @@
 }
 .paginationItem {
     position: relative;
-    z-index: 999;
+    z-index: 10;
     width: 100%;
     display: flex;
     padding-left: 335px;
@@ -53,7 +53,6 @@
     margin-bottom: 30px;
     box-sizing: border-box;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    z-index: 99;
     .postHeader {
         display: flex;
         .imageOwnerPost {

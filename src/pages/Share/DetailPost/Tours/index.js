@@ -1,121 +1,166 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStar, faMapLocation, faLocationDot } from '@fortawesome/free-solid-svg-icons';
-import styles from './Tours.module.scss'; // Adjust the import path according to your file structure
-import { VND } from '../../../../helper/index';
-import { useNavigate } from 'react-router-dom';
-import { Tooltip } from 'react-tooltip';
-import { routeKey } from '../../../../Components/pathName';
-import { useDispatch } from 'react-redux';
-import { PostIdFromTour } from '../../../../store/postSlice';
+import React, { useState } from 'react';
+import Lightbox from 'react-image-lightbox';
 
-const Tours = ({ tourDtoList, postId }) => {
-    const navigate = useNavigate();
-    const dispath = useDispatch();
-    // const formatDateTime = (dateTimeString) => {
-    //     const date = new Date(dateTimeString);
-    //     const options = {
-    //         year: 'numeric',
-    //         month: '2-digit',
-    //         day: '2-digit',
-    //         // hour: '2-digit',
-    //         // minute: '2-digit',
-    //         // second: '2-digit',
-    //         // hour12: false,
-    //     };
-    //     return new Intl.DateTimeFormat('vi-VN', options).format(date).replace(/\./g, '/');
-    // };
-    const handleNavigateDetailTour = (id) => {
-        // alert(postId);
-        dispath(PostIdFromTour(postId));
-        navigate(`${routeKey.detailTour.replace(':id', id)}`);
+import { LoadingPopup } from '../../../../Components/Loading/LoadingPopup';
+import TourDetail from '../../../Business/Add/Tour/TourDetail';
+import { Tooltip } from 'react-tooltip';
+
+const Tour = ({ tours }) => {
+    const [lightboxOpen, setLightboxOpen] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    // const [tours, setTours] = useState(toursJson);
+
+    const [openTourIndexLightBox, setOpenTourIndexLightBox] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedTourId, setSelectedTourId] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [isModalDetailOpen, setIsModalDetailOpen] = useState(false);
+    const [selectedTour, setSelectedTour] = useState(null);
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setSelectedTourId(null);
     };
-    // console.log(tourDtoList);
+    const openLightbox = (imageIndex, tourId) => {
+        setCurrentImageIndex(imageIndex);
+        setOpenTourIndexLightBox(tourId);
+        setLightboxOpen(true);
+    };
+
+    const openModalDetail = (tour) => {
+        setSelectedTour(tour);
+        setIsModalDetailOpen(true);
+    };
+
+    const closeModalDetail = () => {
+        setIsModalDetailOpen(false);
+        setSelectedTour(null);
+    };
     return (
-        <div className={styles.tourContainer}>
-            {tourDtoList &&
-                tourDtoList.map((tour, index) => (
-                    <div className={styles.tourCard} key={index}>
-                        <div className={styles.cardHeader} onClick={() => handleNavigateDetailTour(tour.tour_id)}>
-                            <span
-                                className={styles.cardTitle}
-                                data-tooltip-id="title-click-details"
-                                data-tooltip-place="top"
-                                data-tooltip-content="Click to see details "
-                            >
-                                {tour.titleTour}
-                            </span>
+        <div className="container mx-auto">
+            {tours?.map((tour, tourIndex) => (
+                <div
+                    // onClick={() => openModalDetail(tour)}
+                    key={tour.tour_id}
+                    className="flex bg-gradient-to-r from-blue-400 to-green-400 rounded-lg shadow-lg p-4 m-4 hover:shadow-xl transition-shadow duration-300 text-gray-900 relative"
+                >
+                    <img
+                        src={tour.companyAvatar}
+                        alt={tour.companyTour}
+                        className="w-16 h-16 rounded-full border-2 border-white mr-4"
+                    />
+                    <div className="flex-grow">
+                        <h2
+                            className="text-2xl font-bold cursor-pointer"
+                            data-tooltip-id="title-click-details"
+                            data-tooltip-place="top"
+                            data-tooltip-content="Click to see details "
+                            onClick={() => openModalDetail(tour)}
+                        >
+                            {tour.titleTour}
+                        </h2>
+                        <p className="text-gray-700">Công ty: {tour.companyTour}</p>
+                        <div className="flex items-center my-1">
+                            {Array.from({ length: 5 }, (_, index) => (
+                                <svg
+                                    key={index}
+                                    className={`w-5 h-5 ${
+                                        index < Math.round(tour.ratingDto) ? 'text-yellow-500' : 'text-gray-300'
+                                    }`}
+                                    fill="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path d="M12 .587l3.668 7.431 8.168 1.185-5.898 5.73 1.391 8.116L12 18.896l-7.329 3.855 1.391-8.116-5.898-5.73 8.168-1.185z" />
+                                </svg>
+                            ))}
+                            <span className="ml-2 text-gray-600">({tour.ratingDto || 0})</span> {/* Updated key */}
                         </div>
-                        <div className={styles.cardBody}>
-                            <div className={styles.cardImage}>
+                        <p className="text-lg font-semibold">
+                            {(tour.price * (1 - tour.discount)).toLocaleString()} VND{' '}
+                            <span className="line-through text-gray-400">{tour.price.toLocaleString()} VND</span>{' '}
+                            {/* Updated logic */}
+                        </p>
+                        <p className="text-gray-700">
+                            Thời gian: {new Date(tour.startTime).toLocaleDateString()} -{' '}
+                            {new Date(tour.endTime).toLocaleDateString()} {/* Updated keys */}
+                        </p>
+                        <div className="flex mt-2">
+                            {tour.imageTour.slice(0, 4).map((image, index) => (
                                 <img
-                                    className={styles.imageItem}
-                                    src={`http://localhost:8086/api/post/${tour.imageTour}/image`}
-                                    alt={tour.imageTour}
+                                    key={index}
+                                    src={image}
+                                    alt={`TourImage ${index + 1}`}
+                                    className="w-24 h-24 rounded-lg border-2 border-gray-300 mr-2 cursor-pointer"
+                                    onClick={() => {
+                                        setCurrentImageIndex(index);
+                                        setOpenTourIndexLightBox(tourIndex); // Updated key
+                                        setLightboxOpen(true);
+                                    }}
                                 />
-                            </div>
-                            <div className={styles.cardInfo}>
-                                <div className={styles.cardInfoBottom}>
-                                    <div className={styles.rating}>
-                                        {[1, 2, 3, 4, 5].map((star) => (
-                                            <span
-                                                className={styles.ratingItem}
-                                                key={star}
-                                                style={{
-                                                    cursor: 'pointer',
-                                                }}
-                                            >
-                                                <FontAwesomeIcon icon={faStar} />
-                                            </span>
-                                        ))}
-                                    </div>
-                                    <div className={styles.review}>
-                                        <b>Reviews: 320 Review</b>
-                                    </div>
-                                    <div className={styles.price}>
-                                        <b>Price: {VND.format(tour.price)}</b>
-                                    </div>
+                            ))}
+                            {tour.imageTour.length > 4 && (
+                                <div
+                                    className="w-24 h-24 rounded-lg border-2 border-gray-300 flex items-center justify-center cursor-pointer"
+                                    onClick={() => {
+                                        setCurrentImageIndex(4);
+                                        setOpenTourIndexLightBox(tourIndex);
+                                        setLightboxOpen(true);
+                                    }}
+                                >
+                                    <span className="text-gray-600 text-2xl">+</span>
                                 </div>
-                                <div className={styles.cardInfoTop}>
-                                    <b>
-                                        Destination: <FontAwesomeIcon icon={faMapLocation} />
-                                    </b>
-                                    <div className={styles.destinationTour}>
-                                        <ul>
-                                            {tour.destiationDtoList.map((des, index) => (
-                                                <li className={styles.destinationItem} key={index}>
-                                                    <FontAwesomeIcon icon={faLocationDot} /> {des.desName}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                    <div className={styles.tourCalendar}>
-                                        {/* <p className={styles.description}>{tour.description}</p> */}
-                                        {/* <div className={`${styles.startDay} ${styles.date}`}>
-                                            <p>
-                                                <FontAwesomeIcon icon={faClock} /> Start_Day:{' '}
-                                                {formatDateTime(tour.startTime)}
-                                            </p>
-                                        </div>
-                                        <div className={`${styles.date} ${styles.endDay}`}>
-                                            <p>
-                                                <FontAwesomeIcon icon={faClock} /> End_Day:{' '}
-                                                {formatDateTime(tour.endTime)}
-                                            </p>
-                                        </div>
-                                        <div className={`${styles.dayTour} ${styles.date}`}>
-                                            <p>
-                                                <FontAwesomeIcon icon={faCalendar} /> Days: {tour.dayTour} day
-                                            </p>
-                                        </div> */}
-                                    </div>
-                                </div>
-                            </div>
+                            )}
                         </div>
+                        <p className="text-gray-700 mt-2">
+                            Điểm đến:{' '}
+                            {tour.destiationDtoList
+                                .slice(0, 4)
+                                .map((dest) => dest.desName)
+                                .join(', ')}{' '}
+                            {/* Updated key */}
+                            {tour.destiationDtoList.length > 4 && (
+                                <span className="text-blue-500 cursor-pointer" onClick={() => openModalDetail(tour)}>
+                                    {' '}
+                                    ...Xem thêm
+                                </span>
+                            )}
+                        </p>
                     </div>
-                ))}
+                </div>
+            ))}
+
+            {lightboxOpen && (
+                <Lightbox
+                    mainSrc={tours[openTourIndexLightBox]?.imageTour[currentImageIndex]} // Updated key
+                    nextSrc={
+                        tours[openTourIndexLightBox]?.imageTour[
+                            (currentImageIndex + 1) % tours[openTourIndexLightBox]?.imageTour.length
+                        ]
+                    }
+                    prevSrc={
+                        tours[openTourIndexLightBox]?.imageTour[
+                            (currentImageIndex + tours[openTourIndexLightBox]?.imageTour.length - 1) %
+                                tours[openTourIndexLightBox]?.imageTour.length
+                        ]
+                    }
+                    onCloseRequest={() => setLightboxOpen(false)}
+                    onMovePrevRequest={() =>
+                        setCurrentImageIndex(
+                            (currentImageIndex + tours[openTourIndexLightBox]?.imageTour.length - 1) %
+                                tours[openTourIndexLightBox]?.imageTour.length,
+                        )
+                    }
+                    onMoveNextRequest={() =>
+                        setCurrentImageIndex((currentImageIndex + 1) % tours[openTourIndexLightBox]?.imageTour.length)
+                    }
+                />
+            )}
+
+            <LoadingPopup isLoading={loading} />
+            <TourDetail onRequestClose={closeModalDetail} isOpen={isModalDetailOpen} tour={selectedTour} />
             <Tooltip id="title-click-details" />
         </div>
     );
 };
 
-export default Tours;
+export default Tour;

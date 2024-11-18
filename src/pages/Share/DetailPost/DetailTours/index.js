@@ -16,6 +16,7 @@ import { formatTimeDifference } from '../../../../helper/formatTimeDifference';
 import { jwtDecode } from 'jwt-decode';
 import { toast } from 'react-toastify';
 import swal from 'sweetalert';
+import withHeader from '../../../../Components/Layout/withHeader';
 function DetailTour() {
     const [rating] = useState(4.5);
     const [detailTour, setDetailTour] = useState({});
@@ -68,7 +69,10 @@ function DetailTour() {
     }, []);
     const handleMinusQuantity = () => {
         if (quantity < 2) {
-            toast.warning('Quantity cannot be less than 1');
+            toast.warning('Quantity cannot be less than 1', {
+                position: toast.POSITION.BOTTOM_RIGHT,
+                zIndex: 999999,
+            });
         } else {
             setQuantity(quantity - 1);
         }
@@ -76,7 +80,10 @@ function DetailTour() {
 
     const handlePlusQuantity = () => {
         if (quantity > detailTour?.quantityTour - 1) {
-            toast.warning(`Quantity cannot be more than ${detailTour?.quantityTour}`);
+            toast.warning(`Quantity cannot be more than ${detailTour?.quantityTour}`, {
+                position: toast.POSITION.BOTTOM_RIGHT,
+                zIndex: 999999,
+            });
         } else {
             setQuantity(quantity + 1);
         }
@@ -191,7 +198,7 @@ function DetailTour() {
             </div>
 
             <button onClick={() => setShowComment(!showComment)}>
-                {showComment && 'ImageDestination' ? 'ImageDestination' : 'Comment'}
+                {showComment && 'Detail Destination' ? 'Detail Destination' : 'Comment'}
             </button>
             <div className={styles.tabDetail}>
                 {showComment && (
@@ -233,4 +240,4 @@ function DetailTour() {
         </div>
     );
 }
-export default DetailTour;
+export default withHeader(DetailTour);

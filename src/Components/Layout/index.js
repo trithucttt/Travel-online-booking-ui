@@ -2,11 +2,11 @@ import React from 'react';
 
 import Footer from '../Footer/index';
 import Header from '../Header/index';
-const Layout = ({ children }) => {
+const Layout = ({ children, toggleSidebar }) => {
     return (
         <div className="layout">
-            <Header />
-            <main className="pt-8">{children}</main>
+            <Header toggleSidebar={toggleSidebar} />
+            <main className="pt-2">{children}</main>
             <Footer />
         </div>
     );

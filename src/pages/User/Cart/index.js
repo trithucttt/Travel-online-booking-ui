@@ -10,6 +10,7 @@ import swal from 'sweetalert';
 import { useEffect, useState } from 'react';
 import apiService from '../../../Components/ApiService';
 import { jwtDecode } from 'jwt-decode';
+import { LoadingPopup } from '../../../Components/Loading/LoadingPopup';
 function Cart() {
     // const {
     //     cartItems,
@@ -23,7 +24,9 @@ function Cart() {
     const [cartItems, setCartItems] = useState([]);
     const [checkAllCart, setCheckAllCart] = useState(false);
     const [totalPrice, setToltalPrice] = useState(0);
+    const [paymentMethod, setPaymentMethod] = useState('');
     const token = localStorage.getItem('token') || null;
+    const [isLoading, setIsLoading] = useState(false);
     const headers = {
         Authorization: `Bearer ${token}`,
     };
@@ -40,7 +43,7 @@ function Cart() {
             setCartItems(res.data);
             console.log(res.data);
         } else {
-            swal('Ops!!', res.message, 'warning');
+            swal('Ops!!', 'Không có chuyến đi nào trong giỏ hàng!!!', 'warning');
         }
     };
     useEffect(() => {
@@ -80,40 +83,71 @@ function Cart() {
                 window.location.href = urlPayment;
             }
         } else {
-            swal('Ops!!', 'Payment cannot be made if the item is not available', 'warning');
+            swal('Lỗi!!', 'Không có chuyến đi nào được chọn để thanh toán', 'warning');
         }
     };
-    const handleChangeMethodPayment = (value) => {
-        alert(value);
-    };
+    // const handleChangeMethodPayment = (value) => {
+    //     alert(value);
+    // };
 
     const handleDelete = async (id) => {
-        const data = await apiService.request('delete', `cart/delete/${id}`);
-        if (data.responseCode === '200') {
-            swal('Success', data.message, 'success');
-            fetchCartInfo();
-        } else {
-            swal('Ops!!', data.message, 'warning');
+        const confirmed = await swal({
+            title: 'Bạn có chắc muốn xóa?',
+            text: 'Khi xóa, Bạn sẽ không thể phục hồi lại!',
+            icon: 'warning',
+            buttons: true,
+            dangerMode: true,
+        });
+
+        if (confirmed) {
+            setIsLoading(true);
+            try {
+                const data = await apiService.request('delete', `cart/delete/${id}`);
+                if (data.responseCode === '200') {
+                    swal('Thành công', data.message, 'success');
+                    fetchCartInfo();
+                } else {
+                    swal('Cảnh báo!!', data.message, 'warning');
+                }
+            } catch (error) {
+                swal('Lỗi!!', 'Chi tiết lỗi' + error, 'error');
+            } finally {
+                setIsLoading(false);
+            }
         }
     };
 
     const handleDecrement = async (id) => {
         // alert(id);
-        const data = await apiService.request('put', `cart/decrease/${id}`);
-        if (data.responseCode === '200') {
-            swal('Success', data.message, 'success');
-            fetchCartInfo();
-        } else {
-            swal('Ops!!', data.message, 'warning');
+        setIsLoading(true);
+        try {
+            const data = await apiService.request('put', `cart/decrease/${id}`);
+            if (data.responseCode === '200') {
+                swal('Thành công', data.message, 'success');
+                fetchCartInfo();
+            } else {
+                swal('Cảnh báo!!', data.message, 'warning');
+            }
+        } catch (error) {
+            swal('Lỗi!!', 'Chi tiết lỗi' + error, 'error');
+        } finally {
+            setIsLoading(false);
         }
     };
     const handleIncrement = async (id) => {
-        const data = await apiService.request('put', `cart/increase/${id}`);
-        if (data.responseCode === '200') {
-            swal('Success', data.message, 'success');
-            fetchCartInfo();
-        } else {
-            swal('Ops!!', data.message, 'warning');
+        setIsLoading(true);
+        try {
+            const data = await apiService.request('put', `cart/increase/${id}`);
+            if (data.responseCode === '200') {
+                swal('Thành công', data.message, 'success');
+                fetchCartInfo();
+            } else {
+                swal('Cảnh báo!!', data.message, 'warning');
+            }
+        } catch (error) {
+            swal('Có lỗi xảy ra!!', 'Chi tiết lỗi' + error, 'error');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -121,13 +155,63 @@ function Cart() {
         <>
             <div className={styles.containerCart}>
                 <div className={styles.ownerCart}>
-                    <img
+                    {/* <img
                         className={styles.imageUser}
                         alt=""
                         src="https://i.pinimg.com/564x/da/55/9b/da559be15478670b6f92ab7e489a1e50.jpg"
-                        // src={`http://localhost:8086/api/cart/upload/imageCart/${cart.id}`}
                     />
-                    <div className={styles.ownerName}>Owner User</div>
+                    <div className={styles.ownerName}>Nguyễn Trí Thức</div> */}
+
+                    {/* Phần chọn phương thức thanh toán */}
+                    <div className={`${styles.paymentSection} mt-20 pl-10`}>
+                        <h3 className="text-xl font-semibold mb-4 text-gray-800">Chọn phương thức thanh toán:</h3>
+                        <div className={`${styles.paymentOptions} flex flex-col items-center`}>
+                            <label
+                                className={`${styles.paymentOption} ${paymentMethod === 'vnPay' ? 'bg-cyan-600' : ''}`}
+                                onClick={() => setPaymentMethod('vnPay')}
+                            >
+                                <input
+                                    type="radio"
+                                    name="paymentMethod"
+                                    value="vnPay"
+                                    checked={paymentMethod === 'vnPay'}
+                                    onChange={() => setPaymentMethod('vnPay')}
+                                    className="hidden"
+                                />
+                                <span>VNPay</span>
+                            </label>
+                            <label
+                                className={`${styles.paymentOption} ${
+                                    paymentMethod === 'zaloPay' ? 'bg-cyan-600' : ''
+                                }`}
+                                onClick={() => setPaymentMethod('zaloPay')}
+                            >
+                                <input
+                                    type="radio"
+                                    name="paymentMethod"
+                                    value="zaloPay"
+                                    checked={paymentMethod === 'zaloPay'}
+                                    onChange={() => setPaymentMethod('zaloPay')}
+                                    className="hidden"
+                                />
+                                <span>ZaloPay</span>
+                            </label>
+                            <label
+                                className={`${styles.paymentOption} ${paymentMethod === 'paypal' ? 'bg-cyan-600' : ''}`}
+                                onClick={() => setPaymentMethod('paypal')}
+                            >
+                                <input
+                                    type="radio"
+                                    name="paymentMethod"
+                                    value="paypal"
+                                    checked={paymentMethod === 'paypal'}
+                                    onChange={() => setPaymentMethod('paypal')}
+                                    className="hidden"
+                                />
+                                <span>PayPal</span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
                 <div className={styles.infoCart}>
                     <div className={styles.checkOutItem}>
@@ -138,12 +222,12 @@ function Cart() {
                                     <FontAwesomeIcon icon={faSquareCheck} className={styles.checkAllCart} />
                                 )}
                             </div>
-                            ({cartItems.filter((item) => item.checked).length} items checked )
+                            ({cartItems.filter((item) => item.checked).length} số lượng đã chọn )
                         </div>
                         <div className={`${styles.paymentGroup} ${styles.totalPrice}`}>
-                            Total Price: {VND.format(totalPrice)}
+                            Tổng tiền: {VND.format(totalPrice)}
                         </div>
-                        <div className={`${styles.paymentGroup} ${styles.paymentMethod}`}>
+                        {/* <div className={`${styles.paymentGroup} ${styles.paymentMethod}`}>
                             <select onChange={(e) => handleChangeMethodPayment(e.target.value)}>
                                 <option value="" className={styles.optionPayment}>
                                     Select a Payment Method
@@ -153,10 +237,10 @@ function Cart() {
                                 <option value="c">ZALO PAY</option>
                                 <option value="d">MOMO</option>
                             </select>
-                        </div>
+                        </div> */}
                         <div className={`${styles.paymentGroup}`}>
                             <button className={styles.btnCheckOut} onClick={handleCheckOut}>
-                                CheckOut
+                                Thanh toán
                             </button>
                         </div>
                     </div>
@@ -178,6 +262,7 @@ function Cart() {
                 </div>
             </div>
             <ToastContainer />
+            <LoadingPopup isLoading={isLoading} />
         </>
     );
 }

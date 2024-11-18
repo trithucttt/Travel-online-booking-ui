@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 
 import styles from './ChangePass.module.scss';
 import Validation from './Validation';
+import apiService from '../../../Components/ApiService';
+import swal from 'sweetalert';
 
 const ChangePass = () => {
     // eslint-disable-next-line no-unused-vars
@@ -10,6 +12,10 @@ const ChangePass = () => {
         newPass: '',
         confirmPass: '',
     });
+    const token = localStorage.getItem('token') || null;
+    const headers = {
+        Authorization: `Bearer ${token}`,
+    };
     const [error, setError] = useState({});
 
     const handleChangeValue = (e) => {
@@ -28,10 +34,21 @@ const ChangePass = () => {
         // }
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         const errors = Validation(changePass);
         if (Object.keys(errors).length === 0) {
             console.log('No errors. Save the data:', changePass);
+            const data = await apiService.request('post', 'auth/changePass', changePass, headers);
+            if (data.responseCode === '200') {
+                swal('Success!!', data.message, 'success');
+                setChangePass({
+                    oldPass: '',
+                    newPass: '',
+                    confirmPass: '',
+                });
+            } else {
+                swal('Ops!!', data.message, 'warning');
+            }
             setError({});
         } else {
             setError(errors);
@@ -42,14 +59,14 @@ const ChangePass = () => {
         <>
             <div className={styles.changePassContainer}>
                 <div className={styles.loginTitle}>
-                    <h1>Change your password</h1>
+                    <h1>Đổi mật khẩu mới</h1>
                 </div>
                 <div className={styles.changePass}>
                     <div className={styles.formGroup}>
                         <input
                             autoFocus={true}
                             type="password"
-                            placeholder="Old password"
+                            placeholder="Mật khẩu trước đó"
                             className={styles.inputField}
                             value={changePass.oldPass}
                             name="oldPass"
@@ -61,7 +78,7 @@ const ChangePass = () => {
                         <input
                             autoFocus={true}
                             type="password"
-                            placeholder="New password"
+                            placeholder="Mật khẩu mới"
                             className={styles.inputField}
                             value={changePass.newPass}
                             name="newPass"
@@ -72,7 +89,7 @@ const ChangePass = () => {
                     <div className={styles.formGroup}>
                         <input
                             type="password"
-                            placeholder="Confirm new password"
+                            placeholder="Xác nhận lại mật khẩu mới"
                             className={styles.inputField}
                             value={changePass.confirmPass}
                             name="confirmPass"
@@ -82,7 +99,7 @@ const ChangePass = () => {
                     </div>
                     <div className={styles.buttonGroup}>
                         <button onClick={handleSubmit} className={styles.loginButton}>
-                            ConFirm
+                            Xác nhận
                         </button>
                     </div>
                 </div>

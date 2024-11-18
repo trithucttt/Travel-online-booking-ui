@@ -14,38 +14,38 @@ function validatePostData(newPost, listTour) {
         errors.tourId = 'Tour is required';
     }
 
-    listTour.forEach((tour, index) => {
-        let tourErrors = {};
+    // listTour.forEach((tour, index) => {
+    //     let tourErrors = {};
 
-        if (!tour.quantity) {
-            errors[`tour_${index}_quantity`] = 'Quantity is required.';
-        } else if (!checkInteger(tour.quantity)) {
-            errors[`tour_${index}_quantity`] = 'Quantity must be an integer';
-        } else if (tour.quantity < 10 || tour.quantity > 20) {
-            errors[`tour_${index}_quantity`] = 'Quantity must be an integer between 10 and 20.';
-        }
+    //     if (!tour.quantity) {
+    //         errors[`tour_${index}_quantity`] = 'Quantity is required.';
+    //     } else if (!checkInteger(tour.quantity)) {
+    //         errors[`tour_${index}_quantity`] = 'Quantity must be an integer';
+    //     } else if (tour.quantity < 10 || tour.quantity > 20) {
+    //         errors[`tour_${index}_quantity`] = 'Quantity must be an integer between 10 and 20.';
+    //     }
 
-        if (!tour.discount) {
-            errors[`tour_${index}_discount`] = 'Discount is required.';
-            // }
-            // else if (!Number.isInteger(tour.discount)) {
-            //     errors[`tour_${index}_discount`] = 'Discount must be an integer and not null.';
-        } else if (tour.discount >= 100 || tour.discount <= 0) {
-            errors[`tour_${index}_discount`] = 'Discount must be integer and between 0 and 99';
-        }
+    //     if (!tour.discount) {
+    //         errors[`tour_${index}_discount`] = 'Discount is required.';
+    //         // }
+    //         // else if (!Number.isInteger(tour.discount)) {
+    //         //     errors[`tour_${index}_discount`] = 'Discount must be an integer and not null.';
+    //     } else if (tour.discount >= 100 || tour.discount <= 0) {
+    //         errors[`tour_${index}_discount`] = 'Discount must be integer and between 0 and 99';
+    //     }
 
-        if (!tour.dayTour) {
-            errors[`tour_${index}_dayTour`] = 'Day Tour is required.';
-        } else if (!checkInteger(tour.dayTour)) {
-            errors[`tour_${index}_dayTour`] = 'Day Tour must be an integer';
-        } else if (tour.dayTour > 5 || tour.dayTour <= 1) {
-            errors[`tour_${index}_dayTour`] = 'Day Tour must be integer and between 1 and 5';
-        }
+    //     if (!tour.dayTour) {
+    //         errors[`tour_${index}_dayTour`] = 'Day Tour is required.';
+    //     } else if (!checkInteger(tour.dayTour)) {
+    //         errors[`tour_${index}_dayTour`] = 'Day Tour must be an integer';
+    //     } else if (tour.dayTour > 5 || tour.dayTour <= 1) {
+    //         errors[`tour_${index}_dayTour`] = 'Day Tour must be integer and between 1 and 5';
+    //     }
 
-        if (Object.keys(tourErrors).length > 0) {
-            errors[`tour-${index}`] = tourErrors;
-        }
-    });
+    //     if (Object.keys(tourErrors).length > 0) {
+    //         errors[`tour-${index}`] = tourErrors;
+    //     }
+    // });
     const getToDay = () => {
         const today = new Date();
 

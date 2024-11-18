@@ -14,18 +14,24 @@ import AddDestination from '../Add/Destination';
 import { useLocation, useParams } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import ChangePass from '../../Share/ChangePass';
+import OrderHistoryPage from '../../User/HistoryCart';
+import OrderApproval from '../Report/ApprovedOrder';
 
 function Profile() {
     const [activeItem, setActiveItem] = useState(1);
     const [activeSubItem, setActiveSubItem] = useState(null);
     const [infoUser, setInfoUser] = useState([]);
-
+    const [curUser, setCurUser] = useState([]);
     const token = localStorage.getItem('token');
-    const userRole = localStorage.getItem('role');
+    const userRole = localStorage.getItem('role') || null;
     const location = useLocation();
-    const parsToken = jwtDecode(token);
-    const curUser = parsToken.sub;
+    const onlineUser = localStorage.getItem('userId') || null;
     const { userId } = useParams();
+    // kiểm tra user đang đăng nhập và phân quyền
+    function checkUser(userId, onlineUser) {
+        return userId != null && onlineUser != null && userId === onlineUser;
+    }
+    const isSameUser = checkUser(userId, onlineUser);
     const handleClickItem = (itemId) => {
         if (activeItem === itemId) {
             setActiveItem(null);
@@ -65,34 +71,28 @@ function Profile() {
     const filteredSidebarItems = sidebarItems
         .map((item) => ({
             ...item,
-            submenu: item.submenu?.filter((sub) => {
-                return infoUser?.username === curUser;
-            }),
+            submenu: item.submenu?.filter((sub) => infoUser?.username === curUser),
         }))
         .filter((item) => {
-            if (item.id === 2 && userRole !== 'BUSINESS') {
+            if (userId == null && [2, 3, 4].includes(item.id) && userRole !== 'BUSINESS') {
                 return false;
             }
-            if (item.id === 3 && userRole !== 'BUSINESS') {
+            if (item.id === 5 && onlineUser !== userId) {
                 return false;
             }
-            if (item.id === 4 && userRole !== 'BUSINESS') {
+            if (item.id === 6 && userRole !== 'USER') {
                 return false;
             }
-            if (item.id === 5 && userRole !== 'BUSINESS') {
-                return false;
-            }
-            if (item.id === 6 && userRole === 'BUSINESS') {
-                return false;
-            }
-            // if (item.submenu && item.submenu.length === 0) {
-            //     return false;
-            // }
             return true;
         });
 
     useEffect(() => {
         fetchUserData();
+        if (token !== null) {
+            const parsToken = jwtDecode(token);
+            console.log(parsToken);
+            setCurUser(parsToken.sub);
+        }
         // bỏ qua cảnh báo miss dependency thêm dòng comment sau
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [location.pathname]);
@@ -113,13 +113,17 @@ function Profile() {
         } else {
             switch (itemId) {
                 case 1:
-                    return <Info infoUser={infoUser} />;
+                    return <Info infoUser={infoUser} checkUser={isSameUser} />;
                 case 2:
-                    return <PostOwner userId={userId && userId ? userId : infoUser.userId} />;
+                    return <PostOwner userId={userId && userId ? userId : infoUser.userId} checkUser={isSameUser} />;
                 case 3:
-                    return <Tour ownerId={userId && userId ? userId : infoUser.userId} />;
+                    return <Tour ownerId={userId && userId ? userId : infoUser.userId} checkUser={isSameUser} />;
                 case 4:
-                    return <TableDestination />;
+                    return <TableDestination checkUser={isSameUser} />;
+                case 5:
+                    return <OrderApproval />;
+                // case 6:
+                //     return <OrderHistoryPage />;
                 default:
                     return null;
             }
@@ -181,37 +185,37 @@ export default withHeader(Profile);
 const sidebarItems = [
     {
         id: 1,
-        title: 'Profile',
+        title: 'Thông tin tài khoản',
         state: 'PROFILE',
-        submenu: [{ id: '1-1', title: 'Change Password' }],
+        submenu: [{ id: '1-1', title: 'Đổi mật khẩu' }],
     },
     {
         id: 2,
-        title: 'Post',
+        title: 'Bài đăng',
         state: 'POST',
-        submenu: [{ id: '2-1', title: 'Create new post' }],
+        submenu: [{ id: '2-1', title: 'Thêm bài đăng' }],
     },
     {
         id: 3,
-        title: 'Tour',
+        title: 'Chuyến đi',
         state: 'TOUR',
-        submenu: [{ id: '3-1', title: 'Create new tour' }],
+        submenu: [{ id: '3-1', title: 'Thêm chuyến đi' }],
     },
     {
         id: 4,
-        title: 'Destination',
+        title: 'Điểm đến',
         state: 'DESTINATION',
-        submenu: [{ id: '4-1', title: 'Create new destination' }],
+        submenu: [{ id: '4-1', title: 'Thêm điểm đến' }],
     },
     {
         id: 5,
-        title: 'Report',
+        title: 'Báo cáo',
         state: 'REPORT',
         submenu: null,
     },
     {
         id: 6,
-        title: 'History order',
+        title: 'Lịch sử chuyến đi',
         state: 'HISTORY',
         submenu: null,
     },

@@ -1,30 +1,30 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar, faStarHalfAlt } from '@fortawesome/free-solid-svg-icons';
-import styles from './Rating.module.css'; // assuming you have a separate CSS module for styles
 
 function Rating({ rating }) {
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 !== 0;
 
     return (
-        <div>
+        <div className="flex items-center space-x-1">
+            {/* Hiển thị các ngôi sao đầy đủ */}
             {[...Array(fullStars)].map((_, index) => (
-                <span className={styles.rating} key={index} style={{ cursor: 'pointer', color: 'red' }}>
+                <span className="text-red-500 cursor-pointer" key={index}>
                     <FontAwesomeIcon icon={faStar} />
                 </span>
             ))}
+
+            {/* Hiển thị ngôi sao nửa (nếu có) */}
             {hasHalfStar && (
-                <span className={styles.rating} style={{ cursor: 'pointer', color: 'red' }}>
+                <span className="text-red-500 cursor-pointer">
                     <FontAwesomeIcon icon={faStarHalfAlt} />
                 </span>
             )}
+
+            {/* Hiển thị các ngôi sao xám còn lại */}
             {[...Array(5 - fullStars - (hasHalfStar ? 1 : 0))].map((_, index) => (
-                <span
-                    className={styles.rating}
-                    key={index + fullStars + (hasHalfStar ? 1 : 0)}
-                    style={{ cursor: 'pointer', color: 'gray' }}
-                >
+                <span className="text-gray-400 cursor-pointer" key={index + fullStars + (hasHalfStar ? 1 : 0)}>
                     <FontAwesomeIcon icon={faStar} />
                 </span>
             ))}

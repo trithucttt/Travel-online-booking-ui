@@ -3,11 +3,13 @@
     height: 80px;
     display: flex;
     justify-content: space-between;
-    background-color: rgba(0, 0, 0, 0.5);
+    // background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgb(210, 255, 235);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     align-items: center;
     padding: 10px 20px;
     position: fixed;
-    z-index: 100000;
+    z-index: 99;
     box-sizing: border-box;
     .logo {
         width: 50px;
@@ -27,6 +29,7 @@
             height: 30px;
             width: 30px;
             border-radius: 50%;
+            cursor: pointer;
         }
         .cart {
             padding-top: 15px;

@@ -54,7 +54,7 @@ function Payment() {
             queryParams.vnp_TransactionStatus === '02' ||
             queryParams.vnp_TransactionNo === '0'
         ) {
-            alert('Đã hủy thanh toán');
+            swal('Có lỗi xảy ra', 'Đã hủy thanh toán', 'error');
             navigate(routeKey.cart);
         } else {
             setCheckPayment(true);
@@ -94,7 +94,7 @@ function Payment() {
                 navigate(routeKey.cart);
             }
         } else {
-            swal('Failed', 'Payment Failed', 'error');
+            swal('Lỗi', 'Thanh toán lỗi', 'error');
         }
     };
     return (
@@ -108,14 +108,14 @@ function Payment() {
                         </div>
                         <p className="text-2xl md:text-3xl font-light leading-normal mb-8">
                             {' '}
-                            Please Confirm Your Payment
+                            Vui lòng xác nhận hóa đơn của bạn!!
                         </p>
 
                         <button
                             onClick={handleSavePayment}
                             className="px-5 inline py-3 text-sm font-medium leading-5 shadow-2xl text-white transition-all duration-400 border border-transparent rounded-lg focus:outline-none bg-green-600 active:bg-red-600 hover:bg-red-700"
                         >
-                            confirm
+                            Xác nhận
                         </button>
                     </div>
                 )}

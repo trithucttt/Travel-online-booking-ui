@@ -31,7 +31,8 @@ function CartItem({ cart, index, onCheck, checked, onDelete, onDecrease, onIncre
                     <img
                         className={styles.imageItems}
                         alt=""
-                        src={`http://localhost:8086/api/post/${cart.listTourInCart.tourImageName}/image`}
+                        src={cart.listTourInCart.imageTourUrl[0]}
+                        // src={`http://localhost:8086/api/post/${cart.listTourInCart.tourImageName}/image`}
                         // src={`http://localhost:8086/api/cart/upload/imageCart/${cart.id}`}
                         // src="https://i.pinimg.com/564x/01/16/37/011637a289e407972b469e57d3b069fd.jpg"
                     />
@@ -44,14 +45,14 @@ function CartItem({ cart, index, onCheck, checked, onDelete, onDecrease, onIncre
                         <div className={styles.bodyCart}>
                             <ul className={styles.contentCart}>
                                 <li className={styles.contentCartItem}>
-                                    Supplier : {cart.listTourInCart.fullNameSupplier}
+                                    Nhà cung cấp : {cart.listTourInCart.fullNameSupplier}
                                 </li>
                                 {/* <li className={styles.contentCartItem}>Địa điểm : {cart.location}</li> */}
                                 <li className={styles.contentCartItem}>
-                                    Check in date : {formatDateTime(cart.listTourInCart.startTime)}
+                                    Ngày khởi hành : {formatDateTime(cart.listTourInCart.startTime)}
                                 </li>
                                 <li className={styles.contentCartItem}>
-                                    Check out date : {formatDateTime(cart.listTourInCart.endTime)}
+                                    Ngày kết thúc : {formatDateTime(cart.listTourInCart.endTime)}
                                 </li>
                             </ul>
                             <FontAwesomeIcon

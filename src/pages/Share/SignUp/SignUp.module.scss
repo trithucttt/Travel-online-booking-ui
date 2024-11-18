@@ -1,3 +1,6 @@
+.error {
+    color: red;
+}
 .buttonHeader {
     display: flex;
     justify-content: space-between;
@@ -31,7 +34,7 @@
         }
     }
     .signupForm {
-        width: 30%;
+        width: 40%;
         // border: 1px solid #333;
         margin: 0 auto;
         .formTm {
@@ -40,8 +43,15 @@
                 margin: 5px;
                 .inputField {
                     border-color: #37c7e4;
-                    &:hover {
-                        border: 3px solid #37c7e4;
+                }
+            }
+            .groupFullName {
+                display: flex;
+                .fullName {
+                    margin-right: 5px;
+                    width: 100%;
+                    .inputField {
+                        width: 100%;
                     }
                 }
             }
@@ -68,4 +78,18 @@
             }
         }
     }
+}
+.passwordContainer {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.eyeIcon {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    color: #888;
+    font-size: 1.2em;
+    transition: color 0.3s ease;
 }

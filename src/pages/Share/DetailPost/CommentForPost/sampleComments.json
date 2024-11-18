@@ -1,0 +1,38 @@
+[
+    {
+        "id": 1,
+        "user": "John Doe",
+        "avatar": "https://i.pravatar.cc/150?img=1",
+        "content": "This is an awesome post!",
+        "images": null,
+        "time": "08/8/2024, 8:41:16 AM",
+        "replies": [
+            {
+                "id": 1,
+                "user": "Jane Smith",
+                "avatar": "https://i.pravatar.cc/150?img=2",
+                "content": "Thanks! I appreciate your feedback.",
+                "images": [
+                    "https://via.placeholder.com/400x200",
+                    "https://via.placeholder.com/400x200",
+                    "https://via.placeholder.com/400x200"
+                ]
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "user": "Alice Johnson",
+        "avatar": "https://i.pravatar.cc/150?img=3",
+        "content": "Love the scenery in this post!",
+        "time": "01/8/2024, 10:41:16 PM",
+        "images": [
+            "https://i.pinimg.com/564x/8c/ab/28/8cab28435796bebc19917e534953db0c.jpg",
+            "https://i.pinimg.com/564x/6b/79/9c/6b799c0b4833ef0f9cea9d1f415e5061.jpg",
+            "https://i.pinimg.com/564x/2d/15/a6/2d15a6815a0cf568b8efaa203ac2571b.jpg",
+            "https://i.pinimg.com/736x/82/57/b0/8257b0609792600a36c8bf5359871043.jpg",
+            "https://i.pinimg.com/236x/43/1e/0d/431e0d5c1894cbdaea28b4eb61643a23.jpg"
+        ],
+        "replies": []
+    }
+]

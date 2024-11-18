@@ -90,3 +90,26 @@
         }
     }
 }
+
+.friendButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background-color: #4f46e5;
+    color: #fff;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin: 10px auto;
+
+    &:hover {
+        background-color: #4338ca;
+    }
+}
+
+.friendButtonIcon {
+    font-size: 1.2em; /* kích thước icon */
+}

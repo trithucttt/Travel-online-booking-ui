@@ -39,9 +39,9 @@
             .formGroup {
                 margin: 5px;
                 .inputField {
-                    border-color: #37c7e4;
+                    border-color: #37c7e5;
                     &:hover {
-                        border: 3px solid #37c7e4;
+                        border-color: #37c7e4;
                     }
                 }
             }
@@ -90,4 +90,18 @@
     color: red;
     font-style: italic;
     font-size: 15px;
+}
+.passwordContainer {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.eyeIcon {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    color: #888;
+    font-size: 1.2em;
+    transition: color 0.3s ease;
 }

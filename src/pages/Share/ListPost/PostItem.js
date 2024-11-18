@@ -39,7 +39,8 @@ function PostItem({ item, postIndex, formatDateTime, handleDetail, handleImageCl
                         {item.imagePost.slice(0, 3).map((image, imageIndex) => (
                             <img
                                 key={imageIndex}
-                                src={`http://localhost:8086/api/post/${image}/image`}
+                                // src={`http://localhost:8086/api/post/${image}/image`}
+                                src={image}
                                 alt="post-Images"
                                 className={styles.itemImage}
                                 onClick={() => handleImageClick(postIndex, imageIndex)}
@@ -88,14 +89,20 @@ function PostItem({ item, postIndex, formatDateTime, handleDetail, handleImageCl
                         <div className={styles.destinationPost}>
                             <p>Include tour: </p>
                             <ul>
-                                {item.tourDtoList.map((des, index) => (
-                                    <li key={index}>{des.titleTour}</li>
+                                {item.tourDtoList.slice(0, 2).map((tour, index) => (
+                                    <li key={index}>{tour.titleTour}</li>
                                 ))}
+                                {item.tourDtoList.length > 2 && (
+                                    <p className="text-gray-500 italic hover:text-gray-800">
+                                        ... see more(+{item.tourDtoList.length - 2})
+                                    </p>
+                                )}
                             </ul>
                         </div>
-                        <div className={styles.tagDiscount}>
-                            <FontAwesomeIcon icon={faTag} />
-                            {0.25 * 100 + '%'} SALE END OF {format(new Date(), 'dd MMM, yyyy')}
+                        <div>
+                            {/* <FontAwesomeIcon icon={faTag} />
+                            {0.25 * 100 + '%'} SALE END OF {format(new Date(), 'dd MMM, yyyy')} */}
+                            <p className="text-red-500">+ FEE CANCELLATION</p>
                         </div>
                     </div>
                     <div className={styles.postRating} onClick={() => handleDetail(item.id)}>
@@ -106,14 +113,14 @@ function PostItem({ item, postIndex, formatDateTime, handleDetail, handleImageCl
                             </div>
                             {/* <div>{item.ratingAvg}</div> */}
                         </div>
-                        <div className={styles.discount}>
+                        {/* <div className={styles.discount}>
                             {item.discount && item.discount !== 0 && (
                                 <div className={styles.labelDiscount}>{2.5 * 100}% OFF TODAY</div>
                             )}
                             <p className={styles.currentPrice}>{VND.format(item.price)}</p>
                             <p className={styles.priceDiscoun}>{VND.format(item.price - (item.price * 25) / 100)}</p>
-                            <p className={styles.serviceDiscount}>+ FEE CANCELLATION</p>
-                        </div>
+                            
+                        </div> */}
                     </div>
                 </div>
             </div>

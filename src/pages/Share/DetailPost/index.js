@@ -7,13 +7,20 @@ import { faComment, faPlane, faStar, faTag } from '@fortawesome/free-solid-svg-i
 import { useLocation, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Tours from './Tours';
+import RatingPopup from '../SearchPage/RatingItems';
+import CommentPopup from './CommentForPost';
+import apiService from '../../../Components/ApiService';
 
 function DetailPost() {
     const location = useLocation();
     const exploreMoreRef = useRef(null);
     const [scrollDown, setScrollDown] = useState(false);
     const [detailData, setDetailData] = useState([]);
+    const [ratingModalIsOpen, setRatingModalIsOpen] = useState(false);
+    const [isCommentPopupOpen, setIsCommentPopupOpen] = useState(false);
+    const [comments, setComments] = useState([]);
     const { id } = useParams();
+    const postId = parseInt(id, 10);
     useEffect(() => {
         // const handleScroll = () => {
         //     setScrollDown(window.scrollY > 0);
@@ -29,22 +36,56 @@ function DetailPost() {
         // }
     }, [location.hash, scrollDown]);
 
+    const fetchComment = async () => {
+        try {
+            const data = await apiService.request('get', `comment/list/${postId}`);
+            setComments(data);
+            // console.log('Fetch comment', data);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     const fetchDetailPost = async () => {
         try {
             const postId = parseInt(id, 10);
             console.log(typeof postId);
             // const data = await apiService.request('get', `post/detail/${postId}`);
             const response = await axios.get(`http://localhost:8086/api/post/detail/${postId}`);
-            console.log(response.data);
+            // console.log(response.data);
             setDetailData(response.data);
         } catch (e) {
             console.log(e);
         }
     };
+
     useEffect(() => {
         fetchDetailPost();
+        fetchComment();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const openRatingModal = () => {
+        setRatingModalIsOpen(true);
+    };
+
+    const closeRatingModal = () => {
+        setRatingModalIsOpen(false);
+    };
+
+    const handleRate = (newRating) => {
+        // console.log('New Rating:', newRating);
+        closeRatingModal();
+    };
+
+    const countCommentsAndReplies = (comments) => {
+        return comments.reduce((total, comment) => {
+            const replyCount = comment.replies ? countCommentsAndReplies(comment.replies) : 0;
+            return total + 1 + replyCount; // +1 là comment hiện tại
+        }, 0);
+    };
+
+    const totalCommentsAndReplies = countCommentsAndReplies(comments);
     return (
         <div className={styles.postDetail}>
             <div className={styles.detailHeader}>
@@ -68,7 +109,7 @@ function DetailPost() {
                         <h1> {detailData.title}</h1>
                         <div className={styles.tagDiscount}>
                             <FontAwesomeIcon icon={faTag} />
-                            {0.02 * 100 + '%'} SALE END OF
+                            {0.02 * 100 + '%'} Giảm giá hot
                             {/* {format(detailData.end_time, 'dd MMM, yyyy')} */}
                         </div>
                     </div>
@@ -77,21 +118,22 @@ function DetailPost() {
                             <div className={styles.totalTour}>
                                 <FontAwesomeIcon icon={faPlane} />
                                 {detailData?.tourDtoList && <h2> {detailData?.tourDtoList.length}</h2>}
-                                <p>Tours</p>
+                                <p>Chuyến đi</p>
                             </div>
                         </div>
                         <div className={styles.divBorder}>
-                            <div className={styles.avgRating}>
+                            <div className={styles.avgRating} onClick={openRatingModal}>
                                 <FontAwesomeIcon icon={faStar} />
                                 <h2> 4.5</h2>
-                                <p>Start</p>
+                                <p>Đánh giá</p>
                             </div>
                         </div>
                         <div className={styles.divBorder}>
-                            <div className={styles.totalComment}>
+                            <div className={styles.totalComment} onClick={() => setIsCommentPopupOpen(true)}>
                                 <FontAwesomeIcon icon={faComment} />
-                                <h2>{Math.floor(Math.random() * 900) + 100}</h2>
-                                <p>Comment</p>
+                                {/* <h2>{totalCommentsAndReplies}</h2> */}
+                                <h2>1000</h2>
+                                <p>Bình luận</p>
                             </div>
                         </div>
                     </div>
@@ -102,7 +144,7 @@ function DetailPost() {
                             setScrollDown(!scrollDown);
                         }}
                     >
-                        Explore More
+                        Nhiều hơn
                     </button>
                 </div>
                 {/* <div className={styles.headerImages}>
@@ -123,11 +165,18 @@ function DetailPost() {
                 </div> */}
             </div>
             <div className={styles.detailBody}>
-                <Tours tourDtoList={detailData.tourDtoList} postId={id} />
+                <Tours tours={detailData.tourDtoList} />
             </div>
             <div ref={exploreMoreRef} id="exploreMore" className={styles.detailFooter}>
                 {/* <SliderTours tourDtoList={detailData.tourDtoList} images={detailData.imagePost} /> */}
             </div>
+            <CommentPopup
+                postId={postId}
+                isOpen={isCommentPopupOpen}
+                commentPost={comments}
+                onClose={() => setIsCommentPopupOpen(false)}
+            />
+            <RatingPopup isOpen={ratingModalIsOpen} onClose={closeRatingModal} onRate={handleRate} />
         </div>
     );
 }

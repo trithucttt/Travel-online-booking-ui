@@ -1,22 +1,26 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPen } from '@fortawesome/free-solid-svg-icons';
+import { faCheckCircle, faPen } from '@fortawesome/free-solid-svg-icons';
 
 import styles from './Info.module.scss';
 import validateInfo from './validateInfo';
 import apiService from '../../../Components/ApiService';
 import { toast } from 'react-toastify';
 import { jwtDecode } from 'jwt-decode';
+import swal from 'sweetalert';
+import { useParams } from 'react-router-dom';
 
-const Info = ({ infoUser }) => {
+const Info = ({ infoUser, checkUser }) => {
     const [editClick, setEditClick] = useState(false);
     const [errors, setErrors] = useState({});
     const [avatar, setAvatar] = useState('');
+    const [selectedAvatar, setSelectedAvatar] = useState('');
     const token = localStorage.getItem('token');
     const fileInputRef = useRef(null);
-    const parsToken = jwtDecode(token);
-    const curUser = parsToken.sub;
-
+    const [curUser, setCurUser] = useState([]);
+    const [friends, setFriends] = useState([]);
+    const { userId } = useParams();
+    const currentUserId = localStorage.getItem('userId') || '';
     const [editInfo, setEditInfo] = useState({
         username: infoUser?.username,
         firstName: infoUser?.firstName,
@@ -25,6 +29,16 @@ const Info = ({ infoUser }) => {
         address: infoUser?.address,
     });
 
+    const fetchFriends = async () => {
+        console.log('lay userId tu profile', currentUserId);
+
+        try {
+            const response = await apiService.request('get', `auth/friends/${parseInt(currentUserId)}`);
+            setFriends(response);
+        } catch (error) {
+            swal('Lỗi lấy danh sách bạn bè', 'Có lỗi xảy ra khi lấy danh sách bạn bè' + error, 'error');
+        }
+    };
     useEffect(() => {
         setEditInfo({
             username: infoUser?.username,
@@ -33,6 +47,11 @@ const Info = ({ infoUser }) => {
             email: infoUser?.email,
             address: infoUser?.address,
         });
+        if (token !== null) {
+            const parstToken = jwtDecode(token);
+            setCurUser(parstToken.sub);
+        }
+        fetchFriends();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [infoUser]);
 
@@ -92,27 +111,49 @@ const Info = ({ infoUser }) => {
     const handleAvatarChange = (e) => {
         if (e.target.files && e.target.files[0]) {
             // Tạo một URL cho file mới để hiển thị
+            setSelectedAvatar(e.target.files[0]);
             const newImageURL = URL.createObjectURL(e.target.files[0]);
             setAvatar(newImageURL);
         }
     };
-    const handleSaveAvatar = () => {};
+    const handleSaveAvatar = async () => {
+        console.log(selectedAvatar);
+        const headers = {
+            Authorization: `Bearer ${token}`,
+        };
+        const formData = new FormData();
+        formData.append('avatarUser', selectedAvatar);
+        const data = await apiService.request('post', 'auth/change/avatar', formData, headers);
+        if (data.responseCode === '200') {
+            swal('Success', data.message, 'success');
+            setAvatar('');
+            setSelectedAvatar('');
+            const infoUserUpdate = await apiService.request('get', 'auth/profile', null, headers);
+            setEditInfo(infoUserUpdate);
+            setEditClick(!editClick);
+        } else {
+            swal('Failed', data.message, 'warning');
+        }
+    };
+    const isFriend = () => {
+        return friends.some((friend) => friend.userId === parseInt(userId));
+    };
     return (
         <>
             <div className={styles.infoContent}>
                 <div className={styles.infoGroup}>
                     <div className={styles.businessInfo}>
-                        <label>User Name: </label>
+                        <label>Tên đăng nhập: </label>
                         <p className={`${styles.inputInfoUser} ${styles.inputUserName}`}>{editInfo?.username}</p>
                     </div>
                     {!editClick && (
                         <>
                             <div className={styles.businessInfo}>
-                                <label>Last Name: </label>
+                                <label>Họ: </label>
                                 <p className={`${styles.inputInfoUser} ${styles.inputFullName}`}>{editInfo.lastName}</p>
                             </div>
                             <div className={styles.businessInfo}>
-                                <label>First Name: </label>
+                                <label>Tên: </label>
                                 <p className={`${styles.inputInfoUser} ${styles.inputFullName}`}>
                                     {editInfo.firstName}
                                 </p>
@@ -122,7 +163,7 @@ const Info = ({ infoUser }) => {
                                 <p className={`${styles.inputInfoUser} ${styles.inputEmail}`}>{editInfo.email}</p>
                             </div>
                             <div className={styles.businessInfo}>
-                                <label>Address: </label>
+                                <label>Địa chỉ: </label>
                                 <p className={`${styles.inputInfoUser} ${styles.inputAddress}`}>{editInfo.address}</p>
                             </div>
                         </>
@@ -130,7 +171,7 @@ const Info = ({ infoUser }) => {
                     {editClick && (
                         <>
                             <div className={styles.businessInfo}>
-                                <label>Last Name: </label>
+                                <label>Họ: </label>
                                 <input
                                     autoFocus={editClick}
                                     disabled={!editClick}
@@ -143,7 +184,7 @@ const Info = ({ infoUser }) => {
                             </div>
                             {errors.lastName && <div className={styles.error}>{errors.lastName}</div>}
                             <div className={styles.businessInfo}>
-                                <label>First Name: </label>
+                                <label>Tên: </label>
                                 <input
                                     disabled={!editClick}
                                     className={`${styles.inputInfoUser} ${styles.inputFullName}`}
@@ -168,7 +209,7 @@ const Info = ({ infoUser }) => {
                             {errors.email && <div className={styles.error}>{errors.email}</div>}
 
                             <div className={styles.businessInfo}>
-                                <label>Address: </label>
+                                <label>Địa chỉ: </label>
                                 <input
                                     disabled={!editClick}
                                     className={`${styles.inputInfoUser} ${styles.inputAddress}`}
@@ -190,20 +231,27 @@ const Info = ({ infoUser }) => {
                                     disabled={editClick}
                                     onClick={handleEdit}
                                 >
-                                    <FontAwesomeIcon icon={faPen} /> Edit
+                                    <FontAwesomeIcon icon={faPen} /> Chỉnh sửa
                                 </button>
                             )}
+
                             {editClick && (
                                 <button className={`${styles.btn} ${styles.editBtn}`} onClick={handleSave}>
-                                    Save
+                                    Lưu
                                 </button>
                             )}
                             {editClick && (
                                 <button className={`${styles.btn} ${styles.cancelBtn}`} onClick={handleCancel}>
-                                    Cancel
+                                    Hủy bỏ
                                 </button>
                             )}
                         </div>
+                    )}
+                    {!checkUser && (
+                        <button className={styles.friendButton}>
+                            <FontAwesomeIcon icon={faCheckCircle} className={styles.friendButtonIcon} />
+                            {isFriend() ? 'Đã là bạn bè' : 'Kết bạn'}
+                        </button>
                     )}
                 </div>
                 <div className={styles.imageGroup}>
@@ -213,12 +261,14 @@ const Info = ({ infoUser }) => {
                         className={styles.imageUser}
                     />
                     <input type="file" onChange={handleAvatarChange} style={{ display: 'none' }} ref={fileInputRef} />
-                    <button className={styles.changeImgBnt} onClick={() => fileInputRef.current.click()}>
-                        Change image
-                    </button>
+                    {checkUser && (
+                        <button className={styles.changeImgBnt} onClick={() => fileInputRef.current.click()}>
+                            Đổi ảnh đại diện
+                        </button>
+                    )}
                     {avatar && (
                         <button className={styles.changeImgBnt} onClick={handleSaveAvatar}>
-                            Save
+                            Lưu
                         </button>
                     )}
                 </div>

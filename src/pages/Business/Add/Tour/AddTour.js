@@ -1,23 +1,33 @@
-import styles from './AddTour.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faX } from '@fortawesome/free-solid-svg-icons';
+import { faX, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useState } from 'react';
 import apiService from '../../../../Components/ApiService';
-import validateTourData from './vadilationTour';
 import swal from 'sweetalert';
+import { LoadingPopup } from '../../../../Components/Loading/LoadingPopup';
+import validateTour from './vadilationTour';
+import { VND } from '../../../../helper';
 function Add() {
+    const getToDay = () => {
+        const today = new Date();
+        const localDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000);
+        return localDate.toISOString().slice(0, 16);
+    };
     const [listDestination, setListDestination] = useState([]);
     const [destination, setDestination] = useState([]);
     const [errors, setErrors] = useState({});
     const [listDesErrors, setLisDesError] = useState(false);
-    const [inputKey] = useState(Date.now());
-    const [imagePreviewUrl, setImagePreviewUrl] = useState('');
+    const [imagePreviewUrls, setImagePreviewUrls] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
     const [newTour, setNewTour] = useState({
-        image: '',
-        titleTour: '',
+        images: [],
+        title: '',
         description: '',
-        destinationId: '',
-        price: '',
+        price: 100000,
+        discount: 0,
+        startTime: getToDay(),
+        endTime: getToDay(),
+        quantity: 1,
+        destinationIds: [],
     });
 
     useEffect(() => {
@@ -28,7 +38,6 @@ function Add() {
                     Authorization: `Bearer ${token}`,
                 };
                 const data = await apiService.request('get', 'business/destination', null, headers);
-                // console.log(data);
                 setDestination(data);
             } catch (error) {
                 console.log(error);
@@ -39,18 +48,26 @@ function Add() {
 
     const handleValueToursChange = (e, fieldName) => {
         const { value } = e.target;
-        // console.log(`Updating ${fieldName} to ${value}`);
-        setNewTour((prevValues) => ({
-            ...prevValues,
-            [fieldName]: value,
-        }));
-        // console.log(newTour);
+
+        if (fieldName === 'destinationIds') {
+            setNewTour((prevValues) => ({
+                ...prevValues,
+                destinationIds: [...prevValues.destinationIds, value],
+            }));
+        } else {
+            setNewTour((prevValues) => ({
+                ...prevValues,
+                [fieldName]: value,
+            }));
+        }
     };
+
     const handleAddDestination = () => {
-        const selectDestination = destination.find((t) => t.id === Number.parseInt(newTour.destinationId));
-        // console.log(selectDestination);
+        const selectDestination = destination.find(
+            (t) => t.id === Number.parseInt(newTour.destinationIds[newTour.destinationIds.length - 1]),
+        );
+
         if (selectDestination) {
-            // kiem tra ton tai
             const isTourExist = listDestination.some((destination) => destination.id === selectDestination.id);
             if (!isTourExist) {
                 const newListDestination = {
@@ -59,203 +76,291 @@ function Add() {
                 };
                 setListDestination((pre) => [...pre, newListDestination]);
             } else {
-                alert('Tour is ready exist');
+                alert('Destination already exists');
             }
         }
-        // setNewTour((prevTour) => {
-        //     const updatedDestinationIds = Array.from(new Set([...prevTour.destinationId, ...listDestination]));
-        //     return {
-        //         ...prevTour,
-        //         destinationId: updatedDestinationIds,
-        //     };
-        // });
-        // console.log(listDestination);
-        // console.log(newTour);
     };
-    const handleRemoveTour = (destinationId) => {
-        // console.log(listTour);
-        // alert(destinationId);
-        setListDestination((pre) => pre.filter((tour) => tour.id !== destinationId));
+
+    const handleRemoveDestination = (destinationId) => {
+        setListDestination((pre) => pre.filter((dest) => dest.id !== destinationId));
     };
 
     const handleSaveTour = async () => {
-        const validateErrors = validateTourData(newTour, listDestination);
-        console.log(validateErrors);
+        const managerId = localStorage.getItem('userId') || '';
         setLisDesError(true);
-        if (Object.keys(validateErrors).length === 0) {
-            console.log('No validation Error', newTour);
-            const formData = new FormData();
-            formData.append('titleTour', newTour.titleTour);
-            formData.append('price', newTour.price);
-            formData.append('description', newTour.description);
-            formData.append('image', newTour.image);
 
-            if (listDestination && listDestination.length > 0) {
-                const filterDestinationId =
-                    listDestination &&
-                    listDestination?.filter((item) => typeof item === 'object' && item.id).map((item) => item.id);
-                filterDestinationId.forEach((id) => {
-                    formData.append('destinationId', id);
-                });
-            }
-            const token = localStorage.getItem('token');
-            const headers = {
-                Authorization: `Bearer ${token}`,
-            };
-            const data = await apiService.request('post', 'business/tour/save', formData, headers);
-            if (data.responseCode === '200') {
-                // swal('OK!', 'Your comment has been Edited!', 'success');
-                swal('OK!', 'Create New Tour Successfully', 'success');
-                console.log(data.message);
-                setNewTour({
-                    image: '',
-                    price: '',
-                    titleTour: '',
-                    destinationId: '',
-                    description: '',
-                });
-                setImagePreviewUrl('');
-                setListDestination('');
-            } else {
-                swal('Error!', 'Create New Tour Failed', 'error');
-                console.log(data.message);
+        const formData = new FormData();
+        const { images, ...tourWithoutImage } = newTour;
+
+        const addTourRequest = {
+            ...tourWithoutImage,
+            managerId: managerId,
+            destinationIds: Array.isArray(newTour.destinationIds)
+                ? newTour.destinationIds.map((id) => Number(id))
+                : [Number(newTour.destinationIds)],
+        };
+        formData.append('addTourRequest', JSON.stringify(addTourRequest));
+        images.forEach((image) => formData.append('images', image));
+
+        const validateTourData = {
+            ...tourWithoutImage,
+            managerId: managerId,
+            images: images,
+            destinationIds: Array.isArray(newTour.destinationIds)
+                ? newTour.destinationIds.map((id) => Number(id))
+                : [Number(newTour.destinationIds)],
+        };
+        const validationErrors = validateTour(validateTourData);
+        if (validationErrors.length === 0) {
+            try {
+                setIsLoading(true);
+                const data = await apiService.request('post', 'business/tour/save', formData);
+                if (data.responseCode === '200') {
+                    swal('OK!', 'Thêm mới chuyến đi thành công', 'success');
+                    setNewTour({
+                        title: '',
+                        description: '',
+                        price: '',
+                        discount: '',
+                        startTime: '',
+                        endTime: '',
+                        quantity: '',
+                        destinationIds: [],
+                        images: [],
+                    });
+                    setImagePreviewUrls([]);
+                    setListDestination([]);
+                } else {
+                    swal('Error!', 'Thêm chuyến đi thất bại vui lòng kiểm tra thông tin lại', 'error');
+                }
+            } catch (error) {
+                swal('Lỗi!', 'Lỗi xử lý từ máy chủ', 'error');
+            } finally {
+                setIsLoading(false);
             }
         } else {
-            setErrors(validateErrors);
+            setErrors(validationErrors);
         }
     };
-
-    const handleChangeImage = (e) => {
-        const selectedFile = e.target.files[0];
-        console.log(selectedFile);
-        setNewTour((pre) => ({
-            ...pre,
-            image: selectedFile,
+    // Image change handler
+    const handleChangeImages = (e) => {
+        const selectedFiles = Array.from(e.target.files);
+        setNewTour((prevState) => ({
+            ...prevState,
+            images: [...prevState.images, ...selectedFiles],
         }));
-        setImagePreviewUrl(URL.createObjectURL(selectedFile));
+
+        const imagePreviews = selectedFiles.map((file) => URL.createObjectURL(file));
+        setImagePreviewUrls((prevUrls) => [...prevUrls, ...imagePreviews]);
+    };
+
+    // Remove an image
+    const handleRemoveImage = (index) => {
+        const updatedImages = [...newTour.images];
+        updatedImages.splice(index, 1);
+        setNewTour((prevState) => ({
+            ...prevState,
+            images: updatedImages,
+        }));
+
+        const updatedImagePreviews = [...imagePreviewUrls];
+        updatedImagePreviews.splice(index, 1);
+        setImagePreviewUrls(updatedImagePreviews);
     };
     return (
-        <div className={styles.container}>
-            <div className={styles.formGroupTitle}>
-                <label className={styles.labelTitle}>Title Tour:</label>
-                <input
-                    type="text"
-                    value={newTour.titleTour}
-                    className={`${styles.inputInfo} ${styles.inputTitle}`}
-                    placeholder="Enter title Tour"
-                    name="titleTour"
-                    onChange={(e) => handleValueToursChange(e, 'titleTour')}
-                />
-            </div>
-            {errors.titleTour && <div className={styles.error}>{errors.titleTour}</div>}
-            <div className={styles.formGroupDate}>
-                <div className={styles.startDay}>
-                    <label className={styles.labelStartDay}>Description:</label>
+        <div className="p-8 max-w-5xl mx-auto bg-slate-400 rounded-lg shadow-md">
+            <div className="grid grid-cols-2 gap-6">
+                <div className="mb-4 col-span-2">
+                    <label className="block text-gray-700 text-sm font-bold mb-2">Tiêu đề:</label>
+                    <input
+                        type="text"
+                        value={newTour.title}
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        placeholder="Enter title"
+                        onChange={(e) => handleValueToursChange(e, 'title')}
+                    />
+                    {errors.title && <div className="text-red-300 italic text-lg mt-2 font-bold">{errors.title}</div>}
+                </div>
+
+                <div className="mb-4 col-span-2">
+                    <label className="block text-gray-700 text-sm font-bold mb-2">Mô tả:</label>
                     <textarea
-                        className={`${styles.inputInfo} ${styles.inputStartDay}`}
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         value={newTour.description}
-                        placeholder="Enter description Tour"
+                        placeholder="Enter description"
                         onChange={(e) => handleValueToursChange(e, 'description')}
                     />
-                </div>
-                {errors.description && <div className={styles.error}>{errors.description}</div>}
-                <div className={styles.endDay}>
-                    <label className={styles.labelStartDay}>Price:</label>
-                    <input
-                        type="number"
-                        value={newTour.price}
-                        name="price"
-                        placeholder="Enter price Tour"
-                        className={`${styles.inputInfo} ${styles.inputEndDay}`}
-                        onChange={(e) => handleValueToursChange(e, 'price')}
-                    />
-                </div>
-                {errors.price && <div className={styles.error}>{errors.price}</div>}
-                {imagePreviewUrl && (
-                    <div className={styles.formGroupDate}>
-                        {/* anh duoc chon hien thi ơ day */}
-                        <div>
-                            {imagePreviewUrl && (
-                                <img className={styles.imageUpload} src={imagePreviewUrl} alt="Preview" />
-                            )}
-                        </div>
-                    </div>
-                )}
-                <div className={styles.endDay}>
-                    <label className={styles.labelStartDay}>Image:</label>
-                    <input
-                        type="file"
-                        key={inputKey}
-                        className={`${styles.inputInfo} ${styles.inputEndDay}`}
-                        onChange={handleChangeImage}
-                    />
-                    {/* <button onClick={handleReset}>Reset</button> */}
-                </div>
-                {errors.image && <div className={styles.error}>{errors.image}</div>}
-            </div>
-            <div className={styles.formGroupTour}>
-                <div>
-                    <label className={styles.labelselectDestination}>Chose Destination: </label>
-                    <select
-                        className={styles.selectDestination}
-                        value={newTour.destinationId}
-                        onChange={(e) => handleValueToursChange(e, 'destinationId')}
-                    >
-                        <option value="" className={styles.optionTour}>
-                            Select Destination
-                        </option>
-                        {destination.map((item, index) => (
-                            <option key={index} value={item.id} className={styles.optionTour}>
-                                {item.name}
-                            </option>
-                        ))}
-                    </select>
-                    {listDestination.length <= 0 && listDesErrors && (
-                        <div className={styles.error}>Destination is required</div>
+                    {errors.description && (
+                        <div className="text-red-300 italic text-lg mt-2 font-bold">{errors.description}</div>
                     )}
                 </div>
 
-                <button className={styles.btnAddTour} onClick={handleAddDestination}>
-                    Add Destination
-                </button>
-                {listDestination.length > 0 && (
-                    <div className={styles.groupInfoTourAdd}>
-                        <h3>Tour:</h3>
-                        <ul>
-                            {listDestination.map((t, index) => (
-                                <li key={index} className={styles.inFoRoom}>
-                                    <p className={styles.tourNameAdd}>Destination Name: {t.name}</p>
-                                    <FontAwesomeIcon
-                                        className={styles.iconDeleteTour}
-                                        onClick={() => handleRemoveTour(t.id)}
-                                        icon={faX}
-                                    />
-                                </li>
-                            ))}
-                        </ul>
+                <div className="mb-4">
+                    <label className="block text-gray-700 text-sm font-bold mb-2">Giá:</label>
+                    <div className="relative">
+                        <input
+                            type="number"
+                            min={100000}
+                            step={1000}
+                            value={newTour.price}
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline pr-16"
+                            placeholder="Enter price"
+                            onChange={(e) => handleValueToursChange(e, 'price')}
+                        />
+                        <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-700">VNĐ</span>
                     </div>
-                )}
-            </div>
-            {/* <div className={styles.formGroupDiscount}>
-                <label className={styles.labelDiscount}>Discount Post:</label>
-                <div className={styles.controlDiscount}>
-                    <FontAwesomeIcon
-                        className={styles.iconMinus}
-                        icon={faMinus}
-                        onClick={() => handleQuantityChange(false)}
-                    />
-                    <input value={quantity} type="number" className={styles.inputDiscount} readOnly />
-                    <FontAwesomeIcon
-                        icon={faPlus}
-                        className={styles.iconPlus}
-                        onClick={() => handleQuantityChange(true)}
-                    />
+                    {errors.price && <div className="text-red-300 italic text-lg mt-2 font-bold">{errors.price}</div>}
                 </div>
-            </div> */}
-            <div className={styles.groupButton}>
-                <button onClick={handleSaveTour} className={styles.btnSave}>
-                    Save
+
+                <div className="mb-4">
+                    <label className="block text-gray-700 text-sm font-bold mb-2">Chiếc khấu:</label>
+                    <input
+                        type="number"
+                        min={0}
+                        step={0.1}
+                        max={100}
+                        value={newTour.discount}
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        placeholder="Enter discount"
+                        onChange={(e) => handleValueToursChange(e, 'discount')}
+                    />
+                    {errors.discount && (
+                        <div className="text-red-300 italic text-lg mt-2 font-bold">{errors.discount}</div>
+                    )}
+                </div>
+
+                <div className="mb-4">
+                    <label className="block text-gray-700 text-sm font-bold mb-2">Thời gian khởi hành:</label>
+                    <input
+                        type="datetime-local"
+                        value={newTour.startTime}
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        onChange={(e) => handleValueToursChange(e, 'startTime')}
+                    />
+                    {errors.startTime && (
+                        <div className="text-red-300 italic text-lg mt-2 font-bold">{errors.startTime}</div>
+                    )}
+                </div>
+
+                <div className="mb-4">
+                    <label className="block text-gray-700 text-sm font-bold mb-2">Thời gian kết thúc:</label>
+                    <input
+                        type="datetime-local"
+                        value={newTour.endTime}
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        onChange={(e) => handleValueToursChange(e, 'endTime')}
+                    />
+                    {errors.endTime && (
+                        <div className="text-red-300 italic text-lg mt-2 font-bold">{errors.endTime}</div>
+                    )}
+                </div>
+
+                <div className="mb-4">
+                    <label className="block text-gray-700 text-sm font-bold mb-2">Số lượng:</label>
+                    <input
+                        type="number"
+                        min={0}
+                        max={100}
+                        value={newTour.quantity}
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        placeholder="Enter quantity"
+                        onChange={(e) => handleValueToursChange(e, 'quantity')}
+                    />
+                    {errors.quantity && (
+                        <div className="text-red-300 italic text-lg mt-2 font-bold">{errors.quantity}</div>
+                    )}
+                </div>
+
+                <div className="mb-4 col-span-2">
+                    <label className="block text-gray-700 text-sm font-bold mb-2">Điểm đến:</label>
+                    <div className="flex gap-2">
+                        <select
+                            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            onChange={(e) => handleValueToursChange(e, 'destinationIds')}
+                        >
+                            <option value="">Chọn điểm đến</option>
+                            {destination.map((des) => (
+                                <option key={des.id} value={des.id}>
+                                    {des.name}
+                                </option>
+                            ))}
+                        </select>
+                        <button
+                            onClick={handleAddDestination}
+                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        >
+                            Add
+                        </button>
+                    </div>
+                    {listDesErrors && listDestination.length === 0 && (
+                        <div className="text-red-300 italic text-lg mt-2 font-bold">
+                            Vui lòng thêm ít nhất 1 điểm đến
+                        </div>
+                    )}
+                    <ul className="mt-4">
+                        {listDestination.map((des) => (
+                            <li key={des.id} className="flex items-center justify-between">
+                                {des.name}
+                                <button onClick={() => handleRemoveDestination(des.id)} className="text-red-500">
+                                    <FontAwesomeIcon icon={faX} />
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+
+                <div className="mb-4 col-span-2">
+                    <div className="space-y-2">
+                        <label className="block text-gray-700 font-semibold">Ảnh cho chuyến đi</label>
+                        <div className="flex items-center border-2 border-dashed border-blue-400 rounded-md p-4 cursor-pointer">
+                            <input
+                                type="file"
+                                name="imageTour"
+                                onChange={handleChangeImages}
+                                multiple
+                                className="hidden"
+                                id="image-upload"
+                            />
+                            <label
+                                htmlFor="image-upload"
+                                className="flex flex-col items-center justify-center w-full h-full"
+                            >
+                                <FontAwesomeIcon icon={faPlus} size="2x" className="text-blue-500 mb-2" />
+                                <span className="text-gray-600">Kéo thả hoặc nhấn để thêm ảnh</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    {/* Image preview section */}
+                    <div className="grid grid-cols-3 gap-4 mt-4">
+                        {imagePreviewUrls.map((url, index) => (
+                            <div key={index} className="relative group">
+                                <img src={url} alt="Preview" className="w-80 h-60 rounded-md shadow-md" />
+
+                                <button
+                                    onClick={() => handleRemoveImage(index)}
+                                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition duration-30"
+                                >
+                                    <FontAwesomeIcon icon={faTrash} />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+            <div className="flex justify-end">
+                <button
+                    onClick={handleSaveTour}
+                    disabled={isLoading}
+                    className={`bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${
+                        isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
+                >
+                    Lưu
                 </button>
+
+                {/* Hiển thị popup loading khi đang tải */}
+                <LoadingPopup isLoading={isLoading} />
             </div>
         </div>
     );

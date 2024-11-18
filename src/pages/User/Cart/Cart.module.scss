@@ -5,47 +5,63 @@
 
     .ownerCart {
         width: 30%;
-        // border-right: 1px solid hsl(0, 0%, 20%);
         text-align: center;
         height: 90vh;
         border-radius: 10px;
-        // background-color: rgb(193, 241, 241);
         background-image: url('https://i.pinimg.com/564x/ba/c1/3b/bac13be3e2bfa7664aacd956df357442.jpg');
-        // background-image: url('https://i.pinimg.com/736x/ff/56/eb/ff56eb5464c6f1a7786243383fb4a788.jpg');
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         background-position: 20px;
         background-repeat: no-repeat;
-        .imageUser {
-            // // position: absolute;
-            border-radius: 50%;
-            object-fit: cover;
-            // width: 180px;
-            width: 220px;
-            height: 220px;
-            margin: 0 auto;
-            margin-top: 200px;
+    }
 
-            // object-fit: cover;
-            // width: 310px;
-            // height: 232px;
-            // margin: 0 auto;
-            // margin-top: 152px;
-            // margin-left: 62px;
-        }
+    .imageUser {
+        border-radius: 50%;
+        object-fit: cover;
+        width: 220px;
+        height: 220px;
+        margin: 0 auto;
+        margin-top: 200px;
+    }
 
-        .ownerName {
-            // margin-top: 50px;
-            // font-weight: 800;
-            // background: #877823;
-            // background: #877823;
+    .ownerName {
+        font-weight: 800;
+        height: 62px;
+        width: 281px;
+        margin: 48px auto;
+        padding-top: 7px;
+        font-size: 26px;
+    }
 
-            font-weight: 800;
-            height: 62px;
-            width: 281px;
-            margin: 48px 71px auto;
-            padding-top: 7px;
-            font-size: 26px;
-        }
+    /* Phần chọn phương thức thanh toán */
+    .paymentSection {
+        margin: 120px;
+    }
+
+    .paymentOptions {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .paymentOption {
+        cursor: pointer;
+        width: 80%;
+        padding: 12px;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: 500;
+        color: #333;
+        text-align: center;
+        transition: background-color 0.3s ease;
+    }
+
+    .paymentOption:hover {
+        background-color: rgb(38, 137, 165);
+    }
+
+    .paymentOption span {
+        color: inherit;
     }
 
     .infoCart {

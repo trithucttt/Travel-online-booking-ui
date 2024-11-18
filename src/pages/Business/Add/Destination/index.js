@@ -4,6 +4,8 @@ import { toast } from 'react-toastify';
 import apiService from '../../../../Components/ApiService';
 import validateDestinationData from './validationDestinationData';
 import styles from './AddDestination.module.scss';
+import swal from 'sweetalert';
+import { LoadingPopup } from '../../../../Components/Loading/LoadingPopup';
 function Add() {
     const [errors, setErrors] = useState({});
     const [fileImage, setFileImage] = useState([]);
@@ -14,7 +16,7 @@ function Add() {
     const [ward, setWard] = useState([]);
     const [inputKey] = useState(Date.now());
     const [imagePreviewUrl, setImagePreviewUrl] = useState('');
-
+    const [loading, setLoading] = useState(false);
     const [newDestination, setNewDestination] = useState({
         image: '',
         destinationName: '',
@@ -28,7 +30,7 @@ function Add() {
             try {
                 const data = await apiService.request('get', 'business/city');
                 // console.log(data);
-                setCity(data.map((city) => ({ value: city.id, label: city.full_name_en })));
+                setCity(data.map((city) => ({ value: city.id, label: city.full_name })));
             } catch (error) {
                 console.log(error);
             }
@@ -59,7 +61,7 @@ function Add() {
                 id: cityIdSelect,
             },
         );
-        setDistrict(res.map((district) => ({ value: district.id, label: district.full_name_en })));
+        setDistrict(res.map((district) => ({ value: district.id, label: district.full_name })));
     };
     const handleSelectDistrict = async (data) => {
         // console.log('District Id', data);
@@ -74,7 +76,7 @@ function Add() {
                 id: districtIdSelect,
             },
         );
-        setWard(res.map((ward) => ({ value: ward.id, label: ward.full_name_en })));
+        setWard(res.map((ward) => ({ value: ward.id, label: ward.full_name })));
     };
     const handleSelectWard = (data) => {
         console.log(data);
@@ -101,21 +103,28 @@ function Add() {
             formData.append('address', newDestination.address);
             formData.append('wardId', newDestination.wardId);
             formData.append('description', newDestination.description);
-            const data = await apiService.request('post', 'business/destination/save', formData, headers);
-            toast(data);
+            try {
+                setLoading(true);
+                const data = await apiService.request('post', 'business/destination/save', formData, headers);
+                toast(data);
+                setNewDestination({
+                    image: '',
+                    destinationName: '',
+                    address: '',
+                    wardId: '',
+                    description: '',
+                });
+                setImagePreviewUrl('');
+                swal('Thông báo', data, 'info');
+            } catch (error) {
+            } finally {
+                setLoading(false);
+            }
             // console.log('No validation Error formData', formData);
             // formData.forEach((value, key) => {
             //     console.log(`Key: ${key}, Value: ${value}`);
             // });
             // console.log('No validation Error newDestination', newDestination);
-            setNewDestination({
-                image: '',
-                destinationName: '',
-                address: '',
-                wardId: '',
-                description: '',
-            });
-            setImagePreviewUrl('');
         } else {
             setErrors(validateErrors);
         }
@@ -135,23 +144,23 @@ function Add() {
     return (
         <div className={styles.container}>
             <div className={styles.formGroupTitle}>
-                <label className={styles.labelTitle}>Name Destination:</label>
+                <label className={styles.labelTitle}>Tên điểm đến:</label>
                 <input
                     type="text"
                     value={newDestination.destinationName}
                     className={`${styles.inputInfo} ${styles.inputTitle}`}
-                    placeholder="Enter name Destination"
+                    placeholder="Tên điểm đến"
                     name="destinationName"
                     onChange={(e) => handleValueToursChange(e, 'destinationName')}
                 />
             </div>
             {errors.destinationName && <div className={styles.error}>{errors.destinationName}</div>}
             <div className={styles.formGroupTitle}>
-                <label className={styles.labelTitle}>Description:</label>
+                <label className={styles.labelTitle}>Mô tả cho điểm đến:</label>
                 <textarea
                     value={newDestination.description}
                     className={`${styles.inputInfo} ${styles.inputTitle}`}
-                    placeholder="Enter Description"
+                    placeholder="Thêm mô tả điểm đến"
                     name="description"
                     onChange={(e) => handleValueToursChange(e, 'description')}
                 />
@@ -167,7 +176,7 @@ function Add() {
             )}
             <div className={styles.formGroupDate}>
                 <div className={styles.endDay}>
-                    <label className={styles.labelStartDay}>Image:</label>
+                    <label className={styles.labelStartDay}>Ảnh cho điểm đến:</label>
                     <input
                         type="file"
                         key={inputKey}
@@ -179,43 +188,43 @@ function Add() {
             </div>
             <div className={styles.location}>
                 <div className={styles.groupLocation}>
-                    <label className={styles.labelCity}>Choose City:</label>
+                    <label className={styles.labelCity}>Chọn thành phố/tỉnh:</label>
                     <Select
                         className={styles.selectDestination}
                         value={city.find((option) => option.value === cityId)}
                         onChange={handleSelectCity}
                         options={city}
-                        placeholder="Select City"
+                        placeholder="Chọn thành phố/tỉnh"
                     />
-                    {errors.wardId && <div className={styles.error}>City is required</div>}
+                    {errors.wardId && <div className={styles.error}>Tỉnh/Thành phố là bắt buộc</div>}
                 </div>
                 <div className={styles.groupLocation}>
-                    <label className={styles.labelDistrict}>Chose District: </label>
+                    <label className={styles.labelDistrict}>Chọn quận/huyện: </label>
                     <Select
                         className={styles.selectDistrict}
                         value={district?.find((option) => option.value === districtId)}
                         onChange={handleSelectDistrict}
                         options={district}
-                        placeholder="Select District"
+                        placeholder="Chọn quận/huyện"
                         isDisabled={!cityId}
                     />
-                    {errors.wardId && <div className={styles.error}>District is required</div>}
+                    {errors.wardId && <div className={styles.error}>Quận/Huyện là bắt buộc</div>}
                 </div>
                 <div className={styles.groupLocation}>
-                    <label className={styles.labelDistrict}>Chose Ward: </label>
+                    <label className={styles.labelDistrict}>Chọn phường/xã: </label>
                     <Select
                         className={styles.selectWard}
                         value={ward?.find((option) => option.value === ward.id)}
                         onChange={handleSelectWard}
                         options={ward}
-                        placeholder="Select Ward"
+                        placeholder="Chọn phường/xã"
                         isDisabled={!districtId}
                     />
                     {errors.wardId && <div className={styles.error}>{errors.wardId}</div>}
                 </div>
             </div>
             <div className={styles.startDay}>
-                <label className={styles.labelStartDay}>Address:</label>
+                <label className={styles.labelStartDay}>Địa chỉ cụ thể:</label>
                 <input
                     type="text"
                     name="address"
@@ -227,9 +236,10 @@ function Add() {
             {errors.address && <div className={styles.error}>{errors.address}</div>}
             <div className={styles.groupButton}>
                 <button onClick={handleSaveTour} className={styles.btnSave}>
-                    Save
+                    Lưu lại
                 </button>
             </div>
+            <LoadingPopup isLoading={loading} />
         </div>
     );
 }

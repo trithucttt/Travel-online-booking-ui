@@ -1,4 +1,3 @@
-import styles from './AddPost.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faX } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useState } from 'react';
@@ -6,41 +5,31 @@ import { useEffect, useState } from 'react';
 import apiService from '../../../../Components/ApiService';
 import validatePostData from './validatePostData';
 import swal from 'sweetalert';
+
 function AddPost() {
-    const getToDay = () => {
-        const today = new Date();
-        const localDate = new Date(today.getTime() - today.getTimezoneOffset() * 60000);
-        return localDate.toISOString().slice(0, 16);
-    };
     const getEndDay = () => {
         const today = new Date();
         const endDate = new Date(today.setMonth(today.getMonth() + 2));
         const localEndDate = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000);
         return localEndDate.toISOString().slice(0, 16);
     };
+
     const [listTour, setListTour] = useState([]);
     const [tour, setTour] = useState([]);
     const token = localStorage.getItem('token') || null;
     const headers = {
         Authorization: `Bearer ${token}`,
     };
-    const [, setListTourError] = useState(false);
     const [newPost, setNewPost] = useState({
         titlePost: '',
-        startDay: getToDay(),
         endDay: getEndDay(),
-        tourId: '',
     });
     const [errors, setErrors] = useState({});
+
     useEffect(() => {
         const fetchTour = async () => {
             try {
-                const token = localStorage.getItem('token');
-                const headers = {
-                    Authorization: `Bearer ${token}`,
-                };
                 const data = await apiService.request('get', 'business/tours', null, headers);
-                // console.log(data);
                 setTour(data);
             } catch (error) {
                 console.log(error);
@@ -51,241 +40,156 @@ function AddPost() {
 
     const handleValuePostChange = (e, fieldName) => {
         const { value } = e.target;
-        // console.log(`Updating ${fieldName} to ${value}`);
         setNewPost((prevValues) => ({
             ...prevValues,
             [fieldName]: value,
         }));
-        // console.log(newPost);
     };
 
     const handleAddTour = () => {
         const selectTour = tour.find((t) => t.id === Number.parseInt(newPost.tourId));
-        // console.log(selectTour);
         if (selectTour) {
-            // kiem tra ton tai
             const isTourExist = listTour.some((tourItem) => tourItem.id === selectTour.id);
             if (!isTourExist) {
                 const newListTour = {
                     id: selectTour.id,
                     title: selectTour.title,
-                    quantity: 0,
-                    discount: 0.0,
-                    dayTour: 0,
                 };
-                // console.log('newListTour', newListTour);
-                setListTour((pre) => [...pre, newListTour]);
-                // console.log('listTour', listTour);
+                const updatedListTour = [...listTour, newListTour];
+
+                setListTour(updatedListTour);
+                const tourIds = listTour.map((tourItem) => tourItem.id);
+                setNewPost((prevValues) => ({
+                    ...prevValues,
+                    tourId: tourIds,
+                }));
             } else {
-                alert('Tour is ready exist');
+                swal('Tour already exists', '', 'warning');
             }
         }
-
-        // setNewPost((pre) => ({
-        //     ...pre,
-        //     tourId: listTour,
-        // }));
-    };
-
-    const handleTourDetail = (index, fieldName, value) => {
-        const updateTour = listTour.map((tour, i) => {
-            if (i === index) {
-                return { ...tour, [fieldName]: value };
-            }
-            return tour;
-        });
-        setListTour(updateTour);
     };
 
     const handleRemoveTour = (tourId) => {
-        setListTour((pre) => pre.filter((tour) => tour.id !== tourId));
+        const updatedListTour = listTour.filter((tour) => tour.id !== tourId);
+        setListTour(updatedListTour);
+        setNewPost((prevValues) => ({
+            ...prevValues,
+            tourId: updatedListTour,
+        }));
     };
-    const handleSavePost = async () => {
-        const validateErrors = validatePostData(newPost, listTour);
-        console.log(validateErrors);
-        setListTourError(true);
-        if (Object.keys(validateErrors).length === 0) {
-            // console.log('No validation newPost', newPost);
-            // console.log('No validation listTour', listTour);
 
-            const tourData = listTour?.map((tourItem) => ({
-                tourId: tourItem.id,
-                quantity: parseInt(tourItem.quantity),
-                discount: parseFloat(tourItem.discount),
-                dayTour: parseInt(tourItem.dayTour),
-            }));
-            const addPostRequest = {
-                titlePost: newPost.titlePost,
-                startTimePost: newPost.startDay,
-                endTimePost: newPost.endDay,
-                addPostTourRequests: tourData,
-            };
-            console.table('No validation addPostRequest', addPostRequest);
-            const data = await apiService.request('post', 'business/post/save', addPostRequest, headers);
-            if (data.responseCode === '200') {
-                swal('Success', data.message, 'success');
-                setNewPost({
-                    titlePost: '',
-                    startTimePost: getToDay(),
-                    endTimePost: getEndDay(),
-                    tourId: '',
-                });
-                setListTour('');
-            } else {
-                swal('Failed', data.message, 'error');
-            }
-        } else {
+    const handleSavePost = async () => {
+        try {
+            const validateErrors = validatePostData(newPost, listTour);
             setErrors(validateErrors);
+            if (Object.keys(validateErrors).length === 0) {
+                const tourIds = listTour.map((tourItem) => tourItem.id);
+                const addPostRequest = {
+                    ...newPost,
+                    tourId: tourIds,
+                };
+                const data = await apiService.request('post', 'business/post/save', addPostRequest, headers);
+                if (data.responseCode === '200') {
+                    swal('Success', data.message, 'success');
+                    setNewPost({
+                        titlePost: '',
+                        endDay: getEndDay(),
+                        tourId: '',
+                    });
+                    setListTour([]);
+                } else {
+                    swal('Failed', data.message, 'error');
+                }
+            }
+            // const tourIds = listTour.map((tourItem) => tourItem.id);
+
+            // const updatedPost = {
+            //     ...newPost,
+            //     tourId: tourIds,
+            // };
+            // console.log(updatedPost);
+        } catch (error) {
+            swal('Lỗi!!', 'Máy chủ không phản hồi', 'error');
         }
     };
-    return (
-        <>
-            <div className={styles.container}>
-                <div className={styles.formGroupTitle}>
-                    <label className={styles.labelTitle}>Title Post:</label>
-                    <input
-                        type="text"
-                        value={newPost.titlePost}
-                        className={`${styles.inputInfo} ${styles.inputTitle}`}
-                        placeholder="Enter title post"
-                        name="titlePost"
-                        onChange={(e) => handleValuePostChange(e, 'titlePost')}
-                    />
-                </div>
-                {errors.titlePost && <div className={styles.error}>{errors.titlePost}</div>}
-                <div className={styles.formGroupDate}>
-                    <div className={styles.startDay}>
-                        <label className={styles.labelStartDay}>Start Time Post:</label>
-                        <input
-                            type="datetime-local"
-                            value={newPost.startDay}
-                            className={`${styles.inputInfo} ${styles.inputStartDay}`}
-                            onChange={(e) => handleValuePostChange(e, 'startDay')}
-                            name="startDay"
-                        />
-                    </div>
-                    {errors.startDay && <div className={styles.error}>{errors.startDay}</div>}
-                    <div className={styles.endDay}>
-                        <label className={styles.labelStartDay}>End Time Post:</label>
-                        <input
-                            type="datetime-local"
-                            value={newPost.endDay}
-                            className={`${styles.inputInfo} ${styles.inputEndDay}`}
-                            onChange={(e) => handleValuePostChange(e, 'endDay')}
-                        />
-                    </div>
-                    {errors.endDay && <div className={styles.error}>{errors.endDay}</div>}
-                </div>
-                <div className={styles.formGroupTour}>
-                    <div>
-                        <label className={styles.labelSelectTour}>Chose Tour: </label>
-                        <select
-                            className={styles.selectTour}
-                            value={newPost.tourId}
-                            onChange={(e) => handleValuePostChange(e, 'tourId')}
-                        >
-                            <option value="" className={styles.optionTour}>
-                                Select tour
-                            </option>
-                            {tour.map((item, index) => (
-                                <option key={index} value={item.id} className={styles.optionTour}>
-                                    {item.title}
-                                </option>
-                            ))}
-                        </select>
-                        {errors.tourId && <div className={styles.error}>{errors.tourId}</div>}
-                    </div>
-                    <button className={styles.btnAddTour} onClick={handleAddTour}>
-                        Add tour
-                    </button>
-                    {listTour.length > 0 && (
-                        <div className={styles.groupInfoTourAdd}>
-                            <h3>Tour:</h3>
-                            <ul>
-                                {listTour.map((t, index) => (
-                                    <li key={index}>
-                                        <div className={styles.inFoRoom}>
-                                            <p className={styles.tourNameAdd}>Tour Name: {t.title}</p>
-                                            <FontAwesomeIcon
-                                                className={styles.iconDeleteTour}
-                                                onClick={() => handleRemoveTour(t.id)}
-                                                icon={faX}
-                                            />
-                                        </div>
-                                        <div className={styles.detailTour}>
-                                            <div className={styles.groupDetailTour}>
-                                                <div className={styles.infoDetail}>
-                                                    <label>Quantity: </label>
-                                                    <input
-                                                        type="number"
-                                                        placeholder="Quantity"
-                                                        name="quantity"
-                                                        value={t.quantity}
-                                                        onChange={(e) =>
-                                                            handleTourDetail(index, 'quantity', e.target.value)
-                                                        }
-                                                    />
-                                                </div>
-                                                {errors[`tour_${index}_quantity`] &&
-                                                    errors[`tour_${index}_quantity`] && (
-                                                        <div className={styles.error}>
-                                                            {errors[`tour_${index}_quantity`]}
-                                                        </div>
-                                                    )}
-                                            </div>
-                                            <div className={styles.groupDetailTour}>
-                                                <div className={styles.infoDetail}>
-                                                    <label>Discount: </label>
-                                                    <input
-                                                        type="number"
-                                                        placeholder="Discount"
-                                                        name="discount"
-                                                        value={t.discount}
-                                                        onChange={(e) =>
-                                                            handleTourDetail(index, 'discount', e.target.value)
-                                                        }
-                                                    />
-                                                </div>
-                                                {errors[`tour_${index}_discount`] && (
-                                                    <div className={styles.error}>
-                                                        {errors[`tour_${index}_discount`]}
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div className={styles.groupDetailTour}>
-                                                <div className={styles.infoDetail}>
-                                                    <label>Day Tour: </label>
-                                                    <input
-                                                        type="number"
-                                                        name="dayTour"
-                                                        placeholder="Day Tour"
-                                                        value={t.dayTour}
-                                                        onChange={(e) =>
-                                                            handleTourDetail(index, 'dayTour', e.target.value)
-                                                        }
-                                                    />
-                                                </div>
-                                                {errors[`tour_${index}_dayTour`] && (
-                                                    <div className={styles.error}>
-                                                        {errors[`tour_${index}_dayTour`]}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    )}
-                </div>
 
-                <div className={styles.groupButton}>
-                    <button onClick={handleSavePost} className={styles.btnSave}>
-                        Save
+    return (
+        <div className="container mx-auto p-4 bg-white shadow-md rounded-lg">
+            <div className="mb-4">
+                <label className="block text-gray-700 font-bold mb-2">Title Post:</label>
+                <input
+                    type="text"
+                    value={newPost.titlePost}
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    placeholder="Enter title post"
+                    onChange={(e) => handleValuePostChange(e, 'titlePost')}
+                />
+                {errors.titlePost && <div className="text-red-500">{errors.titlePost}</div>}
+            </div>
+
+            <div className="mb-4">
+                <label className="block text-gray-700 font-bold mb-2">End Time Post:</label>
+                <input
+                    type="datetime-local"
+                    value={newPost.endDay}
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    onChange={(e) => handleValuePostChange(e, 'endDay')}
+                />
+                {errors.endDay && <div className="text-red-500">{errors.endDay}</div>}
+            </div>
+
+            <div className="mb-4">
+                <label className="block text-gray-700 font-bold mb-2">Choose Tour:</label>
+                <div className="flex">
+                    <select
+                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        value={newPost.tourId}
+                        onChange={(e) => handleValuePostChange(e, 'tourId')}
+                    >
+                        <option value="">Select tour</option>
+                        {tour.map((item, index) => (
+                            <option key={index} value={item.id}>
+                                {item.title}
+                            </option>
+                        ))}
+                    </select>
+                    <button
+                        className="ml-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none"
+                        onClick={handleAddTour}
+                    >
+                        Add Tour
                     </button>
                 </div>
+                {errors.tourId && <div className="text-red-500">{errors.tourId}</div>}
             </div>
-        </>
+
+            {listTour.length > 0 && (
+                <div className="mb-4">
+                    <h3 className="text-lg font-semibold mb-2">Selected Tours:</h3>
+                    <ul className="space-y-2">
+                        {listTour.map((t, index) => (
+                            <li key={index} className="flex justify-between items-center p-2 border rounded-lg">
+                                <span>{t.title}</span>
+                                <FontAwesomeIcon
+                                    className="text-red-500 cursor-pointer"
+                                    onClick={() => handleRemoveTour(t.id)}
+                                    icon={faX}
+                                />
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+
+            <div className="text-right">
+                <button
+                    onClick={handleSavePost}
+                    className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 focus:outline-none"
+                >
+                    Save
+                </button>
+            </div>
+        </div>
     );
 }
 

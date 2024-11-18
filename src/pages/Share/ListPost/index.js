@@ -1,24 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Lightbox from 'react-image-lightbox';
 import { routeKey } from '../../../Components/pathName';
-import apiService from '../../../Components/ApiService';
 import PostItem from './PostItem';
-import Pagination from './PostPagination';
-
-import styles from './Post.module.scss';
-function Post({ searchPost }) {
+import PostForRoleUser from '../SearchPage/PostForRoleUser/PostForRoleUser';
+function Post({ posts }) {
     // const [showAllImages, setShowAllImages] = useState(false); sử dụng hiển thị all ảnh trên post khi nhấn +
-    const [posts, setPosts] = useState([]);
+    // const [posts, setPosts] = useState([]);
     const [boxImages, setBoxImages] = useState(false);
     const [currentPostIndex, setCurrentPostIndex] = useState(null);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const navigate = useNavigate();
-    const [sizeData, setSizeData] = useState(3);
-
-    useEffect(() => {
-        console.log('get search value in post component', searchPost);
-    }, [searchPost]);
 
     const handleDetail = (id) => {
         // alert(id);
@@ -51,61 +43,13 @@ function Post({ searchPost }) {
 
     /**-------------------------pagination-------------- */
     // const [postPerPage, setPostPage] = useState(1);
-    const [currentPage, setCurrentPage] = useState(1);
     // const totalPage = Math.ceil(posts.length / postPerPage);
     // const indexOfLastPost = currentPage * postPerPage;
     // const indexOfFirstsPost = indexOfLastPost - postPerPage;
-    const [pagination, setPagination] = useState([]);
-    const onChangePage = (pageNumber) => {
-        setCurrentPage(pageNumber);
-    };
-    const handleChangeTotalPage = (value) => {
-        setSizeData(value);
-    };
-    const handleSortPost = (value) => {
-        if (value === 'Price') {
-            // alert(value);
-            const sortedPosts = [...posts].sort((a, b) => a.price - b.price);
-            setPosts(sortedPosts);
-        }
-        if (value === 'Name') {
-            // alert(value);
-            const sortedPosts = [...posts].sort((a, b) => a.title.localeCompare(b.title));
-            setPosts(sortedPosts);
-        }
-        if (value === 'Default') {
-            // fetchPost();
-        }
-    };
-    useEffect(() => {
-        const searchAndPagination = async () => {
-            try {
-                const data = await apiService.request(
-                    'get',
-                    'post/search',
-                    null,
-                    {},
-                    {
-                        title: searchPost || '',
-                        size: sizeData,
-                        currentPage: currentPage,
-                    },
-                );
-                // console.log('searchAndPagination get data', data);
-                // console.log('searchAndPagination get post', data.data);
-                setPosts(data.data);
-                setPagination(data.pagination);
-            } catch (error) {
-                console.log(error);
-            }
-        };
-        // fetchPost();
-        searchAndPagination();
-        // console.log('get search value in post component', searchPost);
-    }, [searchPost, sizeData, currentPage]);
+
     return (
         <>
-            <div className={styles.paginationItem}>
+            {/* <div className={styles.paginationItem}>
                 <div className={styles.paginationControl}>
                     <Pagination
                         currentPage={pagination.currentPage}
@@ -129,34 +73,38 @@ function Post({ searchPost }) {
                         <option value="Name">Name</option>
                     </select>
                 </div>
-            </div>
+            </div> */}
             <div>
-                {posts?.map((item, postIndex) => (
-                    <PostItem
-                        item={item}
-                        key={item.postId}
-                        postIndex={postIndex}
-                        formatDateTime={formatDateTime}
-                        handleDetail={handleDetail}
-                        handleImageClick={handleImageClick}
-                        handleRenderOwnerPost={handleRenderOwnerPost}
-                    />
-                ))}
+                {posts?.map((item, postIndex) =>
+                    item.isBusiness ? (
+                        <PostItem
+                            item={item}
+                            key={item.postId}
+                            postIndex={postIndex}
+                            formatDateTime={formatDateTime}
+                            handleDetail={handleDetail}
+                            handleImageClick={handleImageClick}
+                            handleRenderOwnerPost={handleRenderOwnerPost}
+                        />
+                    ) : (
+                        <PostForRoleUser postForRoleUser={item} key={item.postId} />
+                    ),
+                )}
 
                 {boxImages && currentPostIndex !== null && (
                     <Lightbox
-                        mainSrc={`http://localhost:8086/api/post/${posts[currentPostIndex].imagePost[currentImageIndex]}/image`}
-                        nextSrc={`http://localhost:8086/api/post/${
+                        mainSrc={posts[currentPostIndex].imagePost[currentImageIndex]}
+                        nextSrc={
                             posts[currentPostIndex].imagePost[
                                 (currentImageIndex + 1) % posts[currentPostIndex].imagePost.length
                             ]
-                        }/image`}
-                        prevSrc={`http://localhost:8086/api/post/${
+                        }
+                        prevSrc={
                             posts[currentPostIndex].imagePost[
                                 (currentImageIndex + posts[currentPostIndex].imagePost.length - 1) %
                                     posts[currentPostIndex].imagePost.length
                             ]
-                        }/image`}
+                        }
                         onCloseRequest={() => setBoxImages(false)}
                         onMovePrevRequest={() =>
                             setCurrentImageIndex(
@@ -168,6 +116,30 @@ function Post({ searchPost }) {
                             setCurrentImageIndex((currentImageIndex + 1) % posts[currentPostIndex].imagePost.length)
                         }
                     />
+                    // <Lightbox
+                    //     mainSrc={`http://localhost:8086/api/post/${posts[currentPostIndex].imagePost[currentImageIndex]}/image`}
+                    //     nextSrc={`http://localhost:8086/api/post/${
+                    //         posts[currentPostIndex].imagePost[
+                    //             (currentImageIndex + 1) % posts[currentPostIndex].imagePost.length
+                    //         ]
+                    //     }/image`}
+                    //     prevSrc={`http://localhost:8086/api/post/${
+                    //         posts[currentPostIndex].imagePost[
+                    //             (currentImageIndex + posts[currentPostIndex].imagePost.length - 1) %
+                    //                 posts[currentPostIndex].imagePost.length
+                    //         ]
+                    //     }/image`}
+                    //     onCloseRequest={() => setBoxImages(false)}
+                    //     onMovePrevRequest={() =>
+                    //         setCurrentImageIndex(
+                    //             (currentImageIndex + posts[currentPostIndex].imagePost.length - 1) %
+                    //                 posts[currentPostIndex].imagePost.length,
+                    //         )
+                    //     }
+                    //     onMoveNextRequest={() =>
+                    //         setCurrentImageIndex((currentImageIndex + 1) % posts[currentPostIndex].imagePost.length)
+                    //     }
+                    // />
                 )}
             </div>
         </>
